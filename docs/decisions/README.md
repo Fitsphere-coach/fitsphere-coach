@@ -14,11 +14,18 @@ numbers.
 | C-D8 | 2026-11-03 | **Email verification uses the link, not a 6-digit code.** The shared Supabase project's sign-up email contains a link; changing it would change the trainee app's email (C-D7). The coach app's Verify step asks the coach to tap the link, which opens FitSphere Coach. Everything else in the CF01 screens is as approved. | Claude (forced by C-D7), reported to the owner |
 | C-D6 | 2026-11-03 | The phone app starts on **Expo Go** (no cloud builds) until a native module needs a development build. | Coach developer (default) |
 | C-D9 | 2026-11-03 | **Sign-up goes straight on when Supabase sends no verify email.** The shared Supabase project has "Confirm email" switched off (found in the CF01 phone check: every account is confirmed on creation and no confirmation email is ever sent). Switching it on would change the trainee app's sign-up (C-D7), so the coach app adapts: when sign-up returns a session, the coach skips "Verify your email" and continues as after log in. The link flow (C-D8) stays for when Supabase sends a link. Email ownership is then checked exactly as in the trainee app (not at all while the setting is off). | Coach developer (owner), on Claude's recommendation |
+| C-D10 | 2026-11-03 | **Gym onboarding with a FitSphere approval code.** A new person who creates an account in FitSphere Coach must onboard a gym (gym name, address, total trainees; more fields later) and send a request. The server emails a 6-digit code to FitSphere's approval inbox `appbayaipower@gmail.com`; the gym owner enters it in the app. A correct code within 7 days makes them Head Coach of that gym; after 7 days without approval the request expires and the form must be filled again. Details: `docs/product/coach-scope.md` §4. Supersedes C-D3's "anyone can switch on Head Coach". | Owner (Accepted); details marked Proposed in coach-scope §11 |
+| C-D11 | 2026-11-03 | **Coaches join only by a Head Coach's invitation.** No self sign-up as Coach and no independent coaches; every Coach belongs to one Head Coach's gym. Supersedes C-D3's "anyone can switch on Coach" and "coaches may work alone". | Owner (Accepted) |
+| C-D12 | 2026-11-03 | **Head Coach powers.** The Head Coach can do everything a Coach can do for a trainee, for every trainee of every Coach in the gym, and sees each trainee's Coach. Supersedes C-D3's "counts only; a trainee's data only if the trainee allows it" (D-13). Still blocked in practice by C-D7 until trainees can be linked. | Owner; **Proposed** reading (coach-scope §11 Q1, Q2) until confirmed |
+| C-D13 | 2026-11-03 | **Change log on targets and plans.** Every change records who (name and role) and when; Coaches see the latest author and the full history. | Owner (Accepted) |
+| C-D14 | 2026-11-03 | **"Already a Coach" check on invitations.** When a Head Coach invites an email that already has the Coach role, the app shows "This email is already available as a Coach. Try a different one." and sends nothing. A deliberate exception to invariant 3 (it reveals only the Coach role). | Owner (Accepted) |
+| C-D15 | 2026-11-03 | **A Coach's personal training stays private.** When an invited Coach is also a FitSphere trainee, the Head Coach never sees that Coach's own personal training data. | Owner (Accepted) |
 
 ## Consequences still to apply
-- **Coach spec v0.4:** "Organisation" becomes the Head Coach's team; "Assistant coach" is "Coach";
-  independent coaches are allowed; the Head Coach's trainee view follows D-13; Supabase Realtime and
-  direct database access are replaced by the coach API.
+- **Scope v0.4** (`docs/product/coach-scope.md`, 2026-11-03) replaces the earlier plan for a
+  "Coach spec v0.4": gyms and Head Coach approval (C-D10), invitation-only Coaches (C-D11), Head
+  Coach powers (C-D12), change log (C-D13). Supabase Realtime and direct database access stay
+  replaced by the coach API.
 - **CF01 screens (locked 2026-11-03), four changes before build:** 18+ confirmation on sign-up;
   "Coach" instead of "Assistant coach"; invites for registered users appear inside the app after
   log in; the third sign-up step is "Name your team" (optional).
