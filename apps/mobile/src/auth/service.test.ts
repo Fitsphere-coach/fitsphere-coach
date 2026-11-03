@@ -42,6 +42,20 @@ describe('signUp (CAUTH-006)', () => {
     const noNet = fakeClient({ signUp: async () => ({ error: offline }) });
     expect(await signUp(deps(noNet.client), { fullName: 'Asha Rao', email: 'a@b.co', password: 'irongym2026' })).toBe('offline');
   });
+
+  it('goes straight on when Supabase confirms the account at once and sends no email (C-D9)', async () => {
+    const confirmed = fakeClient({ signUp: async () => ({ data: { session: session() }, error: null }) });
+    expect(await signUp(deps(confirmed.client), { fullName: 'Asha Rao', email: 'a@b.co', password: 'irongym2026' })).toBe('signedIn');
+  });
+
+  it('still asks to check the inbox when Supabase sends a link (no session) or the email is taken', async () => {
+    const link = fakeClient({ signUp: async () => ({ data: { session: null }, error: null }) });
+    expect(await signUp(deps(link.client), { fullName: 'Asha Rao', email: 'a@b.co', password: 'irongym2026' })).toBe('sent');
+    const taken = fakeClient({
+      signUp: async () => ({ data: { session: null }, error: { status: 422, code: 'user_already_exists' } }),
+    });
+    expect(await signUp(deps(taken.client), { fullName: 'Asha Rao', email: 'a@b.co', password: 'irongym2026' })).toBe('sent');
+  });
 });
 
 describe('signIn (CAUTH-001)', () => {

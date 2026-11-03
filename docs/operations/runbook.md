@@ -56,3 +56,4 @@ trainee app is not affected (C-D7). Both apps send the same emails, with the sam
 2. In `apps/api/.env` set `HOST=0.0.0.0`; in `apps/mobile/.env` set `EXPO_PUBLIC_API_URL=http://<this PC's Wi-Fi address>:3100`.
 3. Start the API: `npm run dev -w @fitsphere-coach/api`. Start the app: `npm start -w @fitsphere-coach/mobile` and scan the QR code with Expo Go (phone on the same Wi-Fi).
 4. Use a **test email** you can read. Turn `HOST` off again afterwards.
+5. The shared Supabase project has **Confirm email** off (C-D9): a new sign-up sends no email and goes straight to **Coaching is off**. A sign-up with an email that already has an account (for example, from the trainee app) shows "Verify your email" but sends nothing (invariant 3): use **Log in** with that account's password instead. Do not change the Supabase setting (C-D7).

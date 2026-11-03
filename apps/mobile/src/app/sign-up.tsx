@@ -32,7 +32,9 @@ export default function SignUp() {
     setProblem(null);
     const result = await signUp(deps, { fullName, email, password });
     setBusy(false);
-    if (result === 'sent') router.replace(`/check-email?email=${encodeURIComponent(email.trim().toLowerCase())}`);
+    // 'signedIn': Supabase confirmed the account at once and sent no email (C-D9); go on as after log in.
+    if (result === 'signedIn') router.replace('/');
+    else if (result === 'sent') router.replace(`/check-email?email=${encodeURIComponent(email.trim().toLowerCase())}`);
     else setProblem(result === 'offline' ? TEXTS.offline : TEXTS.tryLater);
   }
 
@@ -53,7 +55,7 @@ export default function SignUp() {
         step="Step 1 of 3"
         first="Start"
         second="coaching"
-        sub="Create your coach account. Next you'll verify your email, then choose Coach or Head Coach."
+        sub="Create your coach account. Next you'll choose Coach or Head Coach."
       />
       <View style={{ marginTop: 24, gap: 18 }}>
         <Field
