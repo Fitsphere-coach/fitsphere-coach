@@ -89,6 +89,21 @@ one Supabase project: the same logins and the same database.
    request expires.
 7. **Expired:** if 7 days pass without approval, the request expires. The person must **fill in the
    gym form again**, which sends a new code to the approval inbox.
+8. **Approved once, approved for good:** after the code is accepted, the gym is approved
+   permanently. Every later log in, on any phone, goes straight into the app as Head Coach. The app
+   never asks to onboard the gym or enter a code again, and the 7-day limit no longer applies.
+
+### 4.2a Where each log in goes
+The server decides from the account's saved state, not from the phone, so the answer is the same on
+every phone and after reinstalling the app.
+
+| Account state | Where log in goes |
+|---|---|
+| Head Coach of an approved gym | Straight into the app (home) |
+| Coach in a gym (accepted invitation) | Straight into the app (home) |
+| Request sent, not approved, within 7 days | "Enter your approval code" |
+| Request expired (7 days passed) | The gym form, to send a new request |
+| No coach role and no request (new account or FitSphere trainee) | The gym form; any pending Coach invitation shows on the same screen |
 
 ### 4.3 Rules for the code
 - Random digits, never shown in the app and never logged.
