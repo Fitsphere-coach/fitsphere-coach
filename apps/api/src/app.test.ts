@@ -5,14 +5,14 @@ import { describe, expect, it } from 'vitest';
 import { createTestAuth, createTestKeys, signToken, TEST_ISSUER } from '../test/helpers/auth.ts';
 import { buildApp } from './app.ts';
 
-type Row = { id: string; email: string; created_at: Date; roles: string[] };
+type Row = { id: string; email: string; created_at: Date; roles: string[]; full_name?: string | null };
 
 /** A stand-in for the database: answers the account lookup from a map keyed by auth subject. */
 function fakeDb(accounts: Map<string, Row>) {
   return {
     query: async (_sql: string, params?: unknown[]) => {
       const row = accounts.get(String(params?.[0]));
-      return { rows: row ? [row] : [] };
+      return { rows: row ? [{ full_name: null, ...row }] : [] };
     },
   } as never;
 }
@@ -103,6 +103,53 @@ describe('GET /v1/me', () => {
     expect(response.statusCode).toBe(200);
     const body = meResponseSchema.parse(response.json());
     expect(body.roles).toEqual(['coach', 'personal']);
+    expect(body.coach).toBeNull();
     expect(body.user.createdAt).toBe('2026-11-03T08:00:00.000Z');
   });
 });
+
+describe('POST /v1/me (validation before any database call)', () => {
+  async function post(payload: unknown) {
+    const { app, keys } = await setup();
+    const token = await signToken(keys, randomUUID());
+    return app.inject({ method: 'POST', url: '/v1/me', headers: { authorization: `Bearer ${token}` }, payload: payload as object });
+  }
+  const valid = { ageConfirmed: true, ageConfirmationTextVersion: '2026-10-27', fullName: 'Asha Rao', coachTermsVersion: '2026-11-03' };
+
+  it('refuses without the 18+ confirmation', async () => {
+    const response = await post({ ...valid, ageConfirmed: false });
+    expect(response.statusCode).toBe(400);
+    expect(response.json().error.code).toBe('AGE_CONFIRMATION_REQUIRED');
+  });
+
+  it('refuses a name that is too short, a missing terms version and unknown fields', async () => {
+    const response = await post({ ageConfirmed: true, ageConfirmationTextVersion: 'v', fullName: ' A ', email: 'x@example.test' });
+    expect(response.statusCode).toBe(400);
+    expect(response.json().error.details).toEqual(
+      expect.arrayContaining([
+        { field: 'fullName', issue: 'out_of_range' },
+        { field: 'coachTermsVersion', issue: 'required' },
+        { field: 'email', issue: 'unknown_field' },
+      ]),
+    );
+  });
+
+  it('refuses an unconfirmed or unknown Supabase user with EMAIL_NOT_VERIFIED or AUTH_REQUIRED', async () => {
+    const { app, keys, supabase } = await setupWithSupabase();
+    const subject = randomUUID();
+    supabase.users.set(subject, { email: 'new@example.test', confirmed: false });
+    const token = await signToken(keys, subject);
+    const unconfirmed = await app.inject({ method: 'POST', url: '/v1/me', headers: { authorization: `Bearer ${token}` }, payload: valid });
+    expect(unconfirmed.json().error.code).toBe('EMAIL_NOT_VERIFIED');
+    const stranger = await signToken(keys, randomUUID());
+    const unknown = await app.inject({ method: 'POST', url: '/v1/me', headers: { authorization: `Bearer ${stranger}` }, payload: valid });
+    expect(unknown.statusCode).toBe(401);
+  });
+});
+
+async function setupWithSupabase() {
+  const { auth, keys, supabase } = await createTestAuth();
+  const app = buildApp({ db: fakeDb(new Map()), auth });
+  await app.ready();
+  return { app, keys, supabase };
+}

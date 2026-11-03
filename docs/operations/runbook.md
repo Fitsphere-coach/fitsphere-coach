@@ -36,3 +36,23 @@
 The API listens on this PC. For Expo Go on the same Wi-Fi, set `HOST=0.0.0.0` in `apps/api/.env`
 and `EXPO_PUBLIC_API_URL=http://<this PC's Wi-Fi address>:3100`. Use test accounts only, and turn
 `HOST` back off after testing.
+
+## 5. Supabase settings for the coach app's email links (CF01, once)
+The verify and reset emails link back to the app that asked for them. Supabase only follows links it
+has been told about, so add the coach app's addresses under **Authentication → URL Configuration →
+Redirect URLs** (click **Add URL** for each):
+
+| Address | Used by |
+|---|---|
+| `fitspherecoach://**` | FitSphere Coach builds (later) |
+| `exp://**` | FitSphere Coach in **Expo Go** (now) |
+
+This only **adds** entries to the list. Keep every existing entry (the trainee app's
+`fitsphere://**` and any others) exactly as it is, and change nothing else on that page, so the
+trainee app is not affected (C-D7). Both apps send the same emails, with the same wording.
+
+## 6. Trying CF01 on your phone
+1. After the CF01 pull request is merged: `npm run migrate -w @fitsphere-coach/api` (adds C0002: coach names and coach terms; schema `coach` only).
+2. In `apps/api/.env` set `HOST=0.0.0.0`; in `apps/mobile/.env` set `EXPO_PUBLIC_API_URL=http://<this PC's Wi-Fi address>:3100`.
+3. Start the API: `npm run dev -w @fitsphere-coach/api`. Start the app: `npm start -w @fitsphere-coach/mobile` and scan the QR code with Expo Go (phone on the same Wi-Fi).
+4. Use a **test email** you can read. Turn `HOST` off again afterwards.

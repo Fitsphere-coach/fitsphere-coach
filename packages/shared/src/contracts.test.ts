@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { isCoachAccount, meResponseSchema, validationDetails } from './contracts.ts';
+import { isCoachAccount, meResponseSchema, meSetupRequestSchema, validationDetails } from './contracts.ts';
 
 describe('isCoachAccount', () => {
   it('is true only with Coach or Head Coach switched on', () => {
@@ -14,8 +14,19 @@ describe('isCoachAccount', () => {
 describe('meResponseSchema', () => {
   it('accepts the trainee API shape and refuses unknown roles', () => {
     const user = { id: '0b6f2a52-6f4b-4c38-9d1f-2b8e4c1a7d10', email: 'a@example.test', createdAt: '2026-11-03T08:00:00Z' };
-    expect(meResponseSchema.safeParse({ user, roles: ['coach'] }).success).toBe(true);
-    expect(meResponseSchema.safeParse({ user, roles: ['admin'] }).success).toBe(false);
+    expect(meResponseSchema.safeParse({ user, roles: ['coach'], coach: { fullName: 'Asha Rao' } }).success).toBe(true);
+    expect(meResponseSchema.safeParse({ user, roles: ['personal'], coach: null }).success).toBe(true);
+    expect(meResponseSchema.safeParse({ user, roles: ['admin'], coach: null }).success).toBe(false);
+  });
+});
+
+describe('meSetupRequestSchema', () => {
+  it('tidies the name and refuses names outside 2 to 60 characters', () => {
+    const base = { ageConfirmed: true, ageConfirmationTextVersion: 'v', coachTermsVersion: 'v' };
+    const parsed = meSetupRequestSchema.safeParse({ ...base, fullName: '  Asha   Rao ' });
+    expect(parsed.success && parsed.data.fullName).toBe('Asha Rao');
+    expect(meSetupRequestSchema.safeParse({ ...base, fullName: ' A ' }).success).toBe(false);
+    expect(meSetupRequestSchema.safeParse({ ...base, fullName: 'x'.repeat(61) }).success).toBe(false);
   });
 });
 

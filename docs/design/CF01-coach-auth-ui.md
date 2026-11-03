@@ -3,13 +3,20 @@
 | | |
 |---|---|
 | **App** | FitSphere Coach (Expo, iOS + Android) |
-| **Status** | UI locked by Mudit, 2026-11-03 |
+| **Status** | UI locked by Mudit, 2026-11-03; changes approved the same day (below) |
 | **Spec IDs** | CAUTH-001, CAUTH-002, CAUTH-003, CAUTH-004, CAUTH-005, CAUTH-006 (`coach-spec.md` v0.3) |
 | **Depends on** | CF00 (app shell, theme from `docs/design/design-system.md`, shared Supabase client) |
 | **Design source** | "FitSphere Coach Screens" canvas in Claude: boards *CAUTH-001 · Log in* … *CAUTH-004 · Log out* |
 | **Put at** | `docs/features/CF01-auth/ui-design.md` in the coach repo |
 
 All visual values come from `docs/design/design-system.md` (same file as the user app). Copy in quotes is exact. UPPERCASE text is rendered by the style (Barlow Condensed uppercase); write it in sentence case in code.
+
+## 0. Changes approved 2026-11-03 (these win over the sections below)
+- **Sign up:** heading "START" / "COACHING"; sub "Create your coach account. Next you'll verify your email, then choose Coach or Head Coach."; an **"I am 18 or older"** checkbox above the terms (the trainee app's exact text), with the hint *Tick "I am 18 or older" to continue.* until ticked. Anyone can sign up as a coach; step 3 is choosing Coach or Head Coach (CF02).
+- **Verify (C-D8):** the email has a **link, not a code** (the shared Supabase email cannot change, C-D7). The screen says "VERIFY YOUR / EMAIL", asks the coach to tap the link (it opens FitSphere Coach), offers OPEN EMAIL APP, RESEND LINK (60 s countdown) and "Verified on another phone? LOG IN". No code boxes. The link opens a "YOU'RE / IN" screen (step 2 of 3 · done) with CONTINUE.
+- **Coaching is off** (was "No coaching team yet"): main button SWITCH ON COACHING (→ CF02); a head coach's invite shows here as a card (with CF03).
+- **Accept invite:** "Coach" instead of "Assistant coach"; built with CF03, when invites can be sent.
+- **Account setup:** the coach's account is created exactly as the trainee app creates one (confirmed email, 18+, the Personal Training User role), plus the coach's name and coach terms in schema `coach`.
 
 ---
 
