@@ -11,6 +11,28 @@ app. It is a **separate app in its own repo** (decision C-D1) that shares **one 
   this app follows (C-D3).
 - This repo: `pradeepKumawatPalara/fitsphere-coach` (Developer 2).
 
+## Current phase (updated 2026-11-03)
+Work moved from the Claude chat to Claude Code in VS Code on the coach developer's PC
+(`C:\fitsphere-coach`). Screen design and specs may still happen in the Claude chat; building,
+running and fixing happen here.
+
+- **CF00 Foundation — done.** Migration C0001 applied to the shared Supabase project.
+- **CF01 Coach sign-in — built and merged (PR #3, crash fix PR #4); owner's phone check in progress.**
+  Migration C0002 applied. Supabase Redirect URLs `exp://**` and `fitspherecoach://**` added.
+  The app runs in **Expo Go** (no `react-native-svg`: Expo Go on the owner's phone lacks it).
+  The phone reaches the API on this PC at `http://192.168.1.50:3100` (Wi-Fi, `HOST=0.0.0.0`).
+  Next: finish the phone check (runbook §6: sign up → verify link → "You're in" → "Coaching is
+  off"; log in errors; forgot/change password; log out). Fix what it finds, one PR per fix.
+- **Next feature: CF02** — switch on Coach / Head Coach and name the team (REQ-ROLE-001; writes
+  only `app.user_roles` rows `coach`/`head_coach` and schema `coach`; check C-D7 first). Design its
+  screens before building and wait for the owner's "UI approved".
+- **Blocked by C-D7 (owner to decide):** the trainee side of CF03 (a trainee accepting an invite),
+  CF04, and coach-set targets and plans (CF05–CF07).
+
+On this PC: install packages with `npm ci` (not `npm install`, which rewrites
+`package-lock.json` on Windows). Never commit `.env` files. Before `npm run migrate`, the change
+must be merged.
+
 ## Sources of truth
 - Decisions for this repo (C-D IDs): `docs/decisions/README.md`
 - Coach product spec (C- requirement IDs, open questions CQ-): `docs/product/coach-spec.md`
