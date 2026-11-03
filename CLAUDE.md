@@ -33,16 +33,29 @@ app. It is a **separate app in its own repo** (decision C-D1) that shares **one 
   `apps/api/src/auth.ts`, and every route declares an access rule in `apps/api/src/access.ts`.
 - Database: the shared Supabase PostgreSQL. This repo owns schema **`coach`** only.
 
+## No impact on the trainee app (C-D7) — highest priority
+Never suggest or make a change that affects Developer 1 or the trainee app (`fitsphere` repo,
+schema `app`, its migrations, its API or its app). In particular:
+- no edits, branches or pull requests in the `fitsphere` repo, and no requests for Developer 1 to
+  change anything;
+- no change to how existing `app` data looks to the trainee app: the coach API writes to `app`
+  only rows the trainee app already ignores, or does not write at all;
+- coach work lives only in this repo and schema `coach`.
+If a coach feature cannot work without a trainee-app change (for example, a trainee accepting an
+invite or seeing coach-set targets), stop and tell the owner; never plan that change yourself.
+
 ## Shared database rules (summary — the contract has the full text)
 1. This repo creates and changes tables **only in schema `coach`**. Never create, alter or drop
-   anything in schema `app`; ask Developer 1 for any `app` change.
+   anything in schema `app`. If a coach feature seems to need an `app` change, stop and tell
+   the owner (C-D7).
 2. Migrations are `apps/api/migrations/C0001_name.sql`, recorded in `coach.schema_migrations`.
    A file that was applied is never edited; add a new one.
-3. The API writes only the `app` tables the contract allows (users, user_roles, links, targets);
-   everything else in `app` is read-only, and only through the access rules.
+3. The API writes to `app` only what the contract allows and C-D7 permits (rows the trainee app
+   ignores); everything else in `app` is read-only, and only through the access rules.
 4. Every `coach` table that points at a user cascades on delete, so account deletion keeps working.
 5. Tests use a local or CI database, never Supabase. Migrations reach the shared project only after
-   the pull request is merged, and only when the owner says so, with a note to Developer 1 first.
+   the pull request is merged, and only when the owner says so. They add tables in schema `coach`
+   only, so they never affect the trainee app.
 6. `apps/api/test/fixtures/app-schema/` is a **copy** of the trainee repo's migrations, used only
    to build schema `app` in the test database. Refresh it when the trainee repo adds a migration;
    never apply it to Supabase.
