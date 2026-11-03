@@ -26,9 +26,11 @@ running and fixing happen here.
 - **Scope changed on 2026-11-03 (v0.4, `docs/product/coach-scope.md`, C-D10 to C-D15):** gyms are
   onboarded and approved by FitSphere with a 6-digit code emailed to `appbayaipower@gmail.com`;
   Coaches join only by a Head Coach's invitation; Head Coach powers; change log on plans.
-- **Next feature: CF02 — gym onboarding and FitSphere approval code.** Do not build it until the
-  owner answers coach-scope §11 Q3 (log-in detection) and Q4 (which email service sends the code;
-  an architecture decision under the framework), then design its screens and wait for "UI approved".
+- **Next feature: CF02 — gym onboarding and FitSphere approval code.** The owner answered
+  coach-scope §11 Q1–Q5. Every account without a coach role, trainee or not, goes to gym onboarding;
+  log in never reveals whether an email exists; limits live in a configuration file (C-D17). Do not
+  build CF02 until the owner accepts **C-D16** (approval email sent through Gmail with an app
+  password), then design its screens and wait for "UI approved".
 - **Blocked by C-D7 (owner to decide):** the trainee side of CF03 (a trainee accepting an invite),
   CF04, and coach-set targets and plans (CF05–CF07).
 

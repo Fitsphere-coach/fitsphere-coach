@@ -6,8 +6,8 @@ one database. Rules 8 to 10 come from the shared database contract; rules 11 to 
 (`docs/product/coach-scope.md`).
 
 1. **Authorization is server-side.** A coach sees a trainee's data only through an **accepted**
-   link. A Head Coach can do for every trainee of the gym's Coaches what a Coach can do (C-D12,
-   Proposed reading) and sees each trainee's Coach, but **never** a Coach's own personal training
+   link. A Head Coach can do for every trainee of the gym's Coaches what a Coach can do (C-D12)
+   and sees each trainee's Coach, but **never** a Coach's own personal training
    data (C-D15). Ending a link ends access to all of that person's data, including past data.
    UI hiding is not access control.
 2. **A trainee cannot edit coach-set targets; coach input wins** (REQ-PLAN-001, coach spec CQ-04).

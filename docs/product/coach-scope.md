@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Version** | 0.4 — 2026-11-03 |
-| **Status** | Owner's scope refinement of 2026-11-03 (decisions C-D10 to C-D15). Items marked **Interpretation** are Claude's reading of the owner's words and stay **Proposed** until the owner confirms them (§11). |
+| **Status** | Owner's scope refinement of 2026-11-03 (decisions C-D10 to C-D17), with the owner's answers of the same day (§11). C-D16 (how the approval email is sent) is **Proposed** until the owner accepts it. |
 | **Authority** | This file is the scope of record. Where `coach-spec.md` (v0.3) disagrees, this file wins. Project rules in `CLAUDE.md` (C-D7 first) still win over both. |
 
 ---
@@ -38,7 +38,7 @@ one Supabase project: the same logins and the same database.
 - Sets the trainee's targets and builds their diet and training plans.
 - Ending the link ends all access to that trainee's data, including past data.
 
-### 3.2 Head Coach → Coaches and their trainees (C-D12, Interpretation — see §11 Q1)
+### 3.2 Head Coach → Coaches and their trainees (C-D12, confirmed by the owner)
 - **Everything a Coach can do for a trainee, the Head Coach can do for every trainee of every
   Coach in the gym**: see their data, set targets, and build or change their plans.
 - The Head Coach also manages the Coaches themselves: invite, see the list, and remove.
@@ -60,9 +60,15 @@ one Supabase project: the same logins and the same database.
 ## 4. Gym onboarding with FitSphere approval (C-D10)
 
 ### 4.1 Who goes through it
-- A **new person** who opens FitSphere Coach and creates an account (email not yet in FitSphere)
-  must onboard a gym before using the app.
-- Whether an **existing FitSphere account** (a trainee) may also onboard a gym: §11 Q3.
+- **Everyone who uses the coach app without a Coach or Head Coach role follows the same route**,
+  whether or not they already have a FitSphere (trainee) account (owner's answer to Q3):
+  - a **new person** taps **Create account**, makes the account, then onboards a gym;
+  - a person who **logs in** with an existing FitSphere account that has no coach role goes straight
+    to gym onboarding.
+- **Log in stays as it is** (owner's answer to Q2): the log-in screen never reveals whether an email
+  has an account. New people start from **Create account**.
+- A person who has a **pending Coach invitation** sees it on the same screen and can accept it
+  instead of onboarding a gym (§5).
 
 ### 4.2 Steps
 1. **Account:** name, email, password, "I am 18 or older", terms (the existing CF01 sign-up).
@@ -77,24 +83,50 @@ one Supabase project: the same logins and the same database.
 5. **Enter the code:** the gym owner enters the 6-digit code in the app.
    - Correct code within 7 days → request **Approved**; the person becomes **Head Coach** of that gym
      and sees the rest of the app.
-   - Wrong code → an error; after **5** wrong tries the code stops working and the owner must send a
-     new request (Proposed default, §11 Q5).
+   - Wrong code → an error; after the **wrong-try limit** (5) the code stops working and the owner
+     must send a new request.
 6. **Waiting:** until approved, every log in returns to "Enter your approval code", showing when the
    request expires.
 7. **Expired:** if 7 days pass without approval, the request expires. The person must **fill in the
    gym form again**, which sends a new code to the approval inbox.
 
 ### 4.3 Rules for the code
-- 6 digits, random, never shown in the app and never logged.
+- Random digits, never shown in the app and never logged.
 - Stored only as a one-way hash; the plain code exists only in the approval email.
-- Valid for 7 days from the request, for that one request only.
-- A new request replaces the previous one; the old code stops working.
-- Requests are limited (Proposed: at most 3 per person per day) so the approval inbox cannot be
-  flooded.
+- Valid for one request only; a new request replaces the previous one and the old code stops
+  working.
+- Requests are limited per person per day so the approval inbox cannot be flooded.
 
-### 4.4 What needs a decision before building
-- **How the server sends the email** to the approval inbox: a new email service is needed (§11 Q4).
-  Supabase's own emails cannot send this message.
+### 4.4 Settings kept in a configuration file (C-D17, owner's answer to Q5)
+These values live in **one configuration file** in the coach server, not in the code, so they can be
+changed later by editing the file and restarting the server, with no code change:
+
+| Setting | Starting value |
+|---|---|
+| Approval inbox (where codes are emailed) | `appbayaipower@gmail.com` |
+| Code length | 6 digits |
+| Days a request stays valid | 7 |
+| Wrong tries allowed per code | 5 |
+| Requests allowed per person per day | 3 |
+| Days a Coach invitation stays valid | 7 |
+| Coach invitations allowed per Head Coach per day | 20 |
+
+- The server checks the file when it starts and refuses to start if a value is missing or out of a
+  sensible range (generic code practices DC-5).
+- The file holds **no secrets**. Passwords for sending email stay in `apps/api/.env`.
+
+### 4.5 How the approval email is sent (C-D16, Proposed until the owner accepts)
+- FitSphere has **no website domain**, so services that need one (for example Resend) are not an
+  option now (owner's answer to Q4).
+- **Proposed:** the coach server sends the email through **Gmail**, signed in to a Gmail account
+  with a Google **app password** (a separate password Google creates for one app). The sending
+  account can be `appbayaipower@gmail.com` itself, emailing its own inbox.
+- The Gmail address and app password are kept only in `apps/api/.env`, never in the repo or logs.
+- Limits to know: Gmail allows a few hundred emails a day from one account, which is far more than
+  gym requests need; Google may block sign-in if the app password is removed.
+- Supabase's own emails cannot be used: they only send sign-in emails to the account's own address.
+- If FitSphere gets a domain later, the sender can move to a service such as Resend by changing the
+  email settings, without changing the onboarding feature.
 
 ---
 
@@ -130,7 +162,7 @@ one Supabase project: the same logins and the same database.
 |---|---|---|
 | CF00 | Foundation | Done |
 | CF01 | Sign-in, sign-up, passwords, log out | Built; phone check in progress. Sign-up's next step changes to gym onboarding (CF02). "Coaching is off" changes to "Onboard your gym / wait for an invitation". |
-| **CF02** | **Gym onboarding and FitSphere approval code** (§4) | **Next** — needs §11 Q3 and Q4 answered, then screens designed and approved |
+| **CF02** | **Gym onboarding and FitSphere approval code** (§4) | **Next** — owner accepts C-D16, then screens are designed and approved |
 | CF03 | Head Coach invites Coaches; Coach accepts; "already a Coach" check; remove a Coach (§5) | After CF02 |
 | CF04 | Trainee list and profile; Head Coach sees each trainee's Coach | Blocked by C-D7 (needs trainee links) |
 | CF05 | Targets (Coach and Head Coach) with change log | Blocked by C-D7 |
@@ -146,10 +178,12 @@ one Supabase project: the same logins and the same database.
 |---|---|
 | Anyone can switch on Coach or Head Coach (C-D3, REQ-ROLE-001) | Head Coach only through approved gym onboarding; Coach only through invitation (C-D10, C-D11) |
 | Coaches may work alone | Every Coach belongs to one Head Coach's gym (C-D11) |
-| Head Coach sees counts only; a trainee's data only if the trainee taps Allow (C-D3, D-13) | Head Coach can do everything a Coach can, for every trainee in the gym, and sees each trainee's Coach (C-D12, Interpretation) |
+| Head Coach sees counts only; a trainee's data only if the trainee taps Allow (C-D3, D-13) | Head Coach can do everything a Coach can, for every trainee in the gym, and sees each trainee's Coach (C-D12) |
 | Invitations never reveal whether an email is registered | Exception: inviting an existing Coach shows "already available as a Coach" (C-D14) |
 | "Set by" label only | Full change log on targets and plans (C-D13) |
 | Sign-up step 3 "Choose your role" | Sign-up step 3 is gym onboarding (C-D10) |
+| "Coaching is off" offers "Switch on coaching" | Every account without a coach role goes to gym onboarding, trainee or not; pending Coach invitations show on the same screen |
+| Limits written in the code | Onboarding and invitation limits live in a configuration file (C-D17) |
 
 ---
 
@@ -176,13 +210,14 @@ one Supabase project: the same logins and the same database.
 
 ---
 
-## 11. Questions for the owner (open)
+## 11. Owner's answers and open questions
 
-| # | Question | Proposed answer until decided |
+| # | Question | Status |
 |---|---|---|
-| Q1 | "Head Coach can perform every task over the coach that a coach can perform over the trainee": does this mean the Head Coach can do everything a Coach does **for the Coach's trainees** (see data, set targets and plans), or that the Head Coach manages **the Coaches** the way a Coach manages trainees (invite, list, remove, set the Coach's own targets)? | The first, plus inviting, listing and removing Coaches. The Head Coach never sees or sets a Coach's own personal training. |
-| Q2 | Today a Head Coach sees a trainee's data only if the trainee taps Allow (D-13). Q1's answer removes that. Should trainees still be told, or asked, that the gym's Head Coach can see their data? | The trainee app is out of scope (C-D7); record as a privacy item for when trainees join. |
-| Q3 | Should "a completely new email" be detected on the **log-in** screen? That tells anyone whether an email has an account. | No: **Log in** stays as it is; **Create account** leads to gym onboarding. An existing FitSphere trainee who logs in to the coach app is offered "Onboard a gym" or "Wait for an invitation". |
-| Q4 | How should the server email the approval code to `appbayaipower@gmail.com`? Options: a sending service such as Resend (needs a sending domain), or Gmail SMTP with an app password. This is a new external service and needs an architecture decision. | Resend, if FitSphere has a domain to send from; otherwise Gmail SMTP for now. |
-| Q5 | Wrong-code limit and request limit. | 5 wrong tries per code; 3 requests per person per day. |
-| Q6 | Which extra gym fields come next (phone, city, GST number, …)? | Added later; the form stores them without code changes to the database. |
+| Q1 | What "Head Coach can perform every task over the coach that a coach can perform over the trainee" means | **Answered 2026-11-03:** the Head Coach can do everything a Coach does for the Coach's trainees (see data, set targets and plans), and also invites, lists and removes Coaches. Never sees or sets a Coach's own personal training (C-D12, C-D15). |
+| Q2 | Detect a "completely new email" on the log-in screen? | **Answered:** no. Log in stays as it is; Create account leads to gym onboarding (§4.1). |
+| Q3 | Does an existing FitSphere trainee who logs in follow a different route? | **Answered:** no. Every account without a coach role follows the same gym onboarding route (§4.1). |
+| Q4 | How the server emails the approval code | **Answered:** FitSphere has no domain. **Proposed** answer: Gmail with an app password (C-D16, §4.5); waits for the owner's acceptance. |
+| Q5 | Wrong-try and request limits | **Answered:** keep them in a configuration file so they change without code (C-D17, §4.4). Starting values: 5 wrong tries, 3 requests a day. |
+| Q6 | Which extra gym fields come next (phone, city, GST number, …) | Open. The form stores extra fields without database changes. |
+| Q7 | Trainees are no longer asked to "Allow" the Head Coach (C-D12). Should trainees be told, or asked, when trainees join? | Open. Recorded as a privacy item for when the trainee side is unblocked (C-D7). |

@@ -8,7 +8,7 @@ tries it on the phone → DONE.
 | CF00 | Foundation: repo, coach API skeleton (token check, access rules, `GET /v1/me`), coach schema and migration runner, phone app shell with the FitSphere theme, CI | CNFR-001…006 | **Done** (merged; C0001 applied 2026-11-03) |
 | CF01 | Coach sign-in, sign-up, verify (link), coaching off, password, log out | CAUTH-001, 003, 004, 005, 006 | **Built — owner's phone check pending** |
 | CF01b | Accepting a coach invite (link and in-app card) — built with CF03 | CAUTH-002 | Moved to CF03 |
-| CF02 | **Gym onboarding and FitSphere approval code** (scope v0.4 §4, C-D10): gym form, request, 6-digit code emailed to the approval inbox, enter code, 7-day expiry. Needs owner answers (coach-scope §11 Q3, Q4) and approved screens | — | **Next** |
+| CF02 | **Gym onboarding and FitSphere approval code** (scope v0.4 §4, C-D10): gym form, request, 6-digit code emailed to the approval inbox, enter code, 7-day expiry. Owner's answers recorded (coach-scope §11); needs C-D16 accepted and approved screens | — | **Next** |
 | CF03 | Head Coach invites Coaches (invitation only, C-D11), "already a Coach" check (C-D14), accept, remove | — | After CF02 |
 | CF04 | Trainee list and profile; Head Coach sees each trainee's Coach — **blocked by C-D7** (needs trainee links) | TRNE-*, TPRO-* | Not started |
 | CF05 | Targets by Coach or Head Coach, with change log (C-D13) — **blocked by C-D7** | CTGT-* | Not started |
