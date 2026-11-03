@@ -15,7 +15,6 @@ import {
   type TextInputProps,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { ClipPath, Defs, G, Line, Polygon } from 'react-native-svg';
 import { fonts, radius, useTheme } from '../theme';
 import { Wordmark } from './Wordmark';
 
@@ -27,26 +26,24 @@ export function Icon({ name, size = 20, color }: { name: IconName; size?: number
   return <Feather name={name} size={size} color={color} accessibilityElementsHidden importantForAccessibility="no" />;
 }
 
-/** The signature corner: diagonal Caramel stripes in a triangle at the top right. */
+/**
+ * The signature corner: diagonal Caramel stripes in a triangle at the top right (design system,
+ * "Signature corner"). Drawn with plain views so it works in Expo Go: a square turned 45° around
+ * the corner shows exactly the triangle (80,0)–(200,0)–(200,120) inside the 200×200 box, and its
+ * vertical bars are the 4 px stripes, 14 px apart, at 45° on screen.
+ */
+const STRIPE_SIDE = 120 * Math.SQRT2;
+const STRIPE_BARS = Array.from({ length: Math.ceil(STRIPE_SIDE / 14) }, (_, index) => index);
+
 export function Stripes() {
   const { colors } = useTheme();
-  const lines = [];
-  // Lines x + y = c, 14 px apart across the stripe direction, 4 px thick.
-  for (let c = 0; c <= 400; c += 19.8) lines.push(c);
   return (
     <View pointerEvents="none" style={styles.stripes} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Svg width={200} height={200}>
-        <Defs>
-          <ClipPath id="corner">
-            <Polygon points="80,0 200,0 200,120" />
-          </ClipPath>
-        </Defs>
-        <G clipPath="url(#corner)">
-          {lines.map((c) => (
-            <Line key={c} x1={c} y1={0} x2={0} y2={c} stroke={colors.stripe} strokeWidth={4} />
-          ))}
-        </G>
-      </Svg>
+      <View style={styles.stripeSquare}>
+        {STRIPE_BARS.map((bar) => (
+          <View key={bar} style={[styles.stripeBar, { backgroundColor: colors.stripe }]} />
+        ))}
+      </View>
     </View>
   );
 }
@@ -373,7 +370,19 @@ export const textStyles = {
 };
 
 const styles = StyleSheet.create({
-  stripes: { position: 'absolute', top: 0, right: 0, width: 200, height: 200 },
+  stripes: { position: 'absolute', top: 0, right: 0, width: 200, height: 200, overflow: 'hidden' },
+  stripeSquare: {
+    position: 'absolute',
+    width: STRIPE_SIDE,
+    height: STRIPE_SIDE,
+    left: 200 - STRIPE_SIDE / 2,
+    top: -STRIPE_SIDE / 2,
+    flexDirection: 'row',
+    gap: 10,
+    overflow: 'hidden',
+    transform: [{ rotate: '45deg' }],
+  },
+  stripeBar: { width: 4, height: STRIPE_SIDE },
   authContent: { flexGrow: 1, paddingHorizontal: 20 },
   pushedContent: { flexGrow: 1, paddingHorizontal: 16 },
   topBar: { height: 44, justifyContent: 'center' },
