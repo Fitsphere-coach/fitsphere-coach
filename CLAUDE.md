@@ -45,6 +45,32 @@ must be merged.
 - Runbook (setup, configuration names, commands): `docs/operations/runbook.md`
 - Always-on invariants: `.claude/rules/project-invariants.md`
 
+## Organisation standards — follow on every task
+The organisation's standards live in `docs/standards/`. Read the ones that apply **before** you
+plan, code, test, review or decide, and follow them on every task:
+
+| Standard | File | Read it when |
+|---|---|---|
+| Generic code practices (CC, VA, ER, SE, DB, AP, PF, DC, LG, UI, CO, CM rules) | `docs/standards/generic-code-practices.md` | **Every code change**, before writing code and again before reporting done (CM-3 diff review) |
+| IT testing rules (GOV, REQ, PLAN, DES, TDATA, API, DATA, SEC, UI, AUTO, REG, DEF, CICD, REL …) | `docs/standards/testing-rules.md` | Writing or changing tests, planning a feature's tests, deciding "done", and before any release |
+| Architecture decision framework (weighted scoring; security, privacy and legal are pass/fail) | `docs/standards/architecture-decision-framework.md` (Markdown copy of the `.docx`) | Any architecture or technology choice, including adding a framework or a major dependency |
+| Decision record format (Proposed → Accepted only by the owner; supersede, never rewrite) | `docs/standards/decision-record-template.md` | Recording a decision. This repo's decisions live in `docs/decisions/README.md` with **C-D** IDs; new entries follow this template's fields and statuses |
+| Starting the application with Claude Code (process guide) | `docs/standards/starting-with-claude-code.md` | Setting up tooling and the per-feature "done" checklist |
+
+How to apply them:
+- **Precedence when rules conflict:** law and security, then this file's project rules (C-D7, the
+  shared database rules, the invariants and Accepted C-D decisions), then the project's existing
+  conventions, then these standards. Name any conflict in the pull request instead of choosing
+  silently (generic code practices, "How to read this file").
+- **Cite the rule IDs** you applied or deviated from in the pull request (for example "SE-3, DB-1,
+  AUTO-…"), and state the reason for any **SHOULD** you did not follow.
+- **Done means** the standards' checklist too: acceptance criteria including failure and permission
+  cases pass; format, lint, type-check, tests and build were run and reported, with what was not
+  verified; no test deleted, skipped or weakened; the final diff reviewed (CM-3).
+- Claude never marks its own decision **Accepted**; the owner does.
+- Known gaps: `generic-code-practices.md` refers to `standards-sources.md`, and the start guide
+  refers to a skills zip (`.claude/skills/`); neither is in this repo yet. Say so if a task needs them.
+
 ## Approved stack (C-D5, same as the trainee app)
 - Phone app: React Native with Expo (expo-router), TypeScript, in `apps/mobile`. Starts on
   **Expo Go**; move to an EAS development build only when a native module needs it, and tell the
