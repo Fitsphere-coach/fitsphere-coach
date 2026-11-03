@@ -23,9 +23,14 @@ running and fixing happen here.
   The phone reaches the API on this PC at `http://192.168.1.50:3100` (Wi-Fi, `HOST=0.0.0.0`).
   Next: finish the phone check (runbook §6: sign up → verify link → "You're in" → "Coaching is
   off"; log in errors; forgot/change password; log out). Fix what it finds, one PR per fix.
-- **Next feature: CF02** — switch on Coach / Head Coach and name the team (REQ-ROLE-001; writes
-  only `app.user_roles` rows `coach`/`head_coach` and schema `coach`; check C-D7 first). Design its
-  screens before building and wait for the owner's "UI approved".
+- **Scope changed on 2026-11-03 (v0.4, `docs/product/coach-scope.md`, C-D10 to C-D15):** gyms are
+  onboarded and approved by FitSphere with a 6-digit code emailed to `appbayaipower@gmail.com`;
+  Coaches join only by a Head Coach's invitation; Head Coach powers; change log on plans.
+- **Next feature: CF02 — gym onboarding and FitSphere approval code.** The owner answered
+  coach-scope §11 Q1–Q5. Every account without a coach role, trainee or not, goes to gym onboarding;
+  log in never reveals whether an email exists; limits live in a configuration file (C-D17). Do not
+  build CF02 until the owner accepts **C-D16** (approval email sent through Gmail with an app
+  password), then design its screens and wait for "UI approved".
 - **Blocked by C-D7 (owner to decide):** the trainee side of CF03 (a trainee accepting an invite),
   CF04, and coach-set targets and plans (CF05–CF07).
 
@@ -35,9 +40,11 @@ must be merged.
 
 ## Sources of truth
 - Decisions for this repo (C-D IDs): `docs/decisions/README.md`
-- Coach product spec (C- requirement IDs, open questions CQ-): `docs/product/coach-spec.md`
-  — v0.3 still describes organisations and direct Supabase access; where it conflicts with C-D3 or
-  C-D5, **C-D3 and C-D5 win** until the spec is updated to v0.4.
+- **Scope of record: `docs/product/coach-scope.md` (v0.4)** — roles, gym onboarding, permissions,
+  feature plan and the owner's open questions (§11). Read it before any feature work.
+- Coach product spec (detailed requirements, IDs CAUTH-, TRNE-, CTGT-, CDIET-, MON- …):
+  `docs/product/coach-spec.md` (v0.3). Where it disagrees with the scope or the C-D decisions,
+  **the scope and the decisions win**.
 - Shared database contract: `docs/contracts/shared-database.md` — **read before any migration or any
   query that touches schema `app`.**
 - Design system: `docs/design/design-system.md`; locked feature UI docs: `docs/design/CF*.md`

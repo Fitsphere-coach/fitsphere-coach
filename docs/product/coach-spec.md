@@ -1,5 +1,7 @@
 # FitSphere Coach — Product Specification (MVP)
 
+> **Superseded in part (2026-11-03):** the scope of record is `coach-scope.md` (v0.4). Organisations, self sign-up as Coach or Head Coach, and the Head Coach's view of trainees are replaced there (C-D10 to C-D15). Use this file for detailed requirements that the scope does not change.
+
 | | |
 |---|---|
 | **Version** | 0.3 (Draft) — CQ-04, CQ-01, CQ-37, CQ-38 decided |
