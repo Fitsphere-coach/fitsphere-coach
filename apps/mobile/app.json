@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "FitSphere Coach",
+    "slug": "fitsphere-coach",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "fitspherecoach",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.fitsphere.coach"
+    },
+    "android": {
+      "package": "com.fitsphere.coach",
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": ["expo-router", "expo-font"]
+  }
+}

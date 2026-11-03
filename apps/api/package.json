@@ -1,0 +1,24 @@
+{
+  "name": "@fitsphere-coach/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=.env src/server.ts",
+    "start": "node --env-file-if-exists=.env src/server.ts",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run src scripts",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "migrate": "node --env-file-if-exists=.env scripts/migrate.ts"
+  },
+  "dependencies": {
+    "@fitsphere-coach/shared": "*",
+    "fastify": "^5.12.7",
+    "jose": "^6.2.13",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "vitest": "^5.0.5"
+  }
+}
