@@ -11,6 +11,7 @@ numbers.
 | C-D4 | 2026-11-03 | Coach targets always win over the trainee's own edits (coach spec CQ-04; trainee repo REQ-PLAN-001). | Coach developer |
 | C-D5 | 2026-11-03 | Same technology as the trainee app: Expo + TypeScript; a TypeScript Node.js API as the only path to the data; Supabase Auth tokens checked on the server; Supabase's Data API off. This repo owns schema `coach`. | Coach developer |
 | C-D7 | 2026-11-03 | **No impact on the trainee app.** Nothing done for the coach app may affect Developer 1 or the trainee app: no changes or requests in the `fitsphere` repo, no changes to schema `app`, and no coach writes that change what the trainee app shows. A coach feature that would need a trainee-app change is stopped and raised with the owner. This narrows C-D3/C-D4 and the shared database contract wherever they asked Developer 1 for work. | Coach developer |
+| C-D8 | 2026-11-03 | **Email verification uses the link, not a 6-digit code.** The shared Supabase project's sign-up email contains a link; changing it would change the trainee app's email (C-D7). The coach app's Verify step asks the coach to tap the link, which opens FitSphere Coach. Everything else in the CF01 screens is as approved. | Claude (forced by C-D7), reported to the owner |
 | C-D6 | 2026-11-03 | The phone app starts on **Expo Go** (no cloud builds) until a native module needs a development build. | Coach developer (default) |
 
 ## Consequences still to apply

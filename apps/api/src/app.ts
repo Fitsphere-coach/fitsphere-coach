@@ -10,7 +10,8 @@ import { registerMeRoutes } from './routes/me.ts';
 export type LogOptions = { level: string; stream?: { write(line: string): void } };
 
 export type AppDeps = {
-  db: Pick<pg.Pool, 'query'>;
+  /** A pool; tests that never set up accounts may pass a stand-in with `query` only. */
+  db: pg.Pool | Pick<pg.Pool, 'query'>;
   auth: Auth;
   /** Leave out for no logs (most tests). */
   log?: LogOptions;

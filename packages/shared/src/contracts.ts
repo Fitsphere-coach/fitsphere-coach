@@ -66,9 +66,35 @@ export const ROLES = ['personal', 'coach', 'head_coach'] as const;
 export type Role = (typeof ROLES)[number];
 export const COACH_ROLES = ['coach', 'head_coach'] as const satisfies readonly Role[];
 
+/**
+ * Version of the "I am 18 or older" text. The coach app shows the trainee app's exact text, so it
+ * records the trainee app's version (fitsphere/packages/shared: AGE_CONFIRMATION_TEXT_VERSION).
+ */
+export const AGE_CONFIRMATION_TEXT_VERSION = '2026-10-27';
+/** Version of the Terms, Privacy Policy and Coach data terms accepted at coach sign-up. */
+export const COACH_TERMS_VERSION = '2026-11-03';
+
+export const FULL_NAME_MIN = 2;
+export const FULL_NAME_MAX = 60;
+export const fullNameSchema = z
+  .string()
+  .transform((name) => name.trim().replace(/\s+/g, ' '))
+  .pipe(z.string().min(FULL_NAME_MIN).max(FULL_NAME_MAX));
+
+/** POST /v1/me: set up the signed-in user's account for the coach app (CAUTH-006). */
+export const meSetupRequestSchema = z.strictObject({
+  ageConfirmed: z.boolean(),
+  ageConfirmationTextVersion: z.string().min(1).max(32),
+  fullName: fullNameSchema,
+  coachTermsVersion: z.string().min(1).max(32),
+});
+export type MeSetupRequest = z.input<typeof meSetupRequestSchema>;
+
 export const meResponseSchema = z.object({
   user: z.object({ id: idSchema, email: z.string(), createdAt: instantSchema }),
   roles: z.array(z.enum(ROLES)),
+  /** Null until the account has been set up in the coach app (name and coach terms). */
+  coach: z.object({ fullName: z.string() }).nullable(),
 });
 export type MeResponse = z.infer<typeof meResponseSchema>;
 
