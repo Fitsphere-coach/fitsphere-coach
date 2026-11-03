@@ -55,7 +55,7 @@ export default function SignUp() {
         step="Step 1 of 3"
         first="Start"
         second="coaching"
-        sub="Create your coach account. Next you'll verify your email, then choose Coach or Head Coach."
+        sub="Create your coach account. Next you'll choose Coach or Head Coach."
       />
       <View style={{ marginTop: 24, gap: 18 }}>
         <Field
