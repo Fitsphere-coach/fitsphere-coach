@@ -17,12 +17,7 @@ const client = new pg.Client({ connectionString: url });
 try {
   await client.connect();
 } catch (error) {
-  const code = (error as { code?: unknown }).code;
-  console.error(
-    code === '28P01'
-      ? 'Could not connect: the database password in DATABASE_URL is wrong.'
-      : 'Could not connect to the database. Check DATABASE_URL and your internet connection.',
-  );
+  console.error(connectionHelp(error));
   process.exit(1);
 }
 console.log('Connected to the database.');
@@ -31,4 +26,22 @@ try {
   console.log(applied.length > 0 ? `Applied: ${applied.join(', ')}` : 'Nothing to apply.');
 } finally {
   await client.end();
+}
+
+/** A plain reason for a failed connection. The driver's own message names the host and user,
+ * never the password, so it is shown too. */
+function connectionHelp(error: unknown): string {
+  const code = String((error as { code?: unknown }).code ?? '');
+  const message = error instanceof Error ? error.message : String(error);
+  const reason =
+    code === '28P01' || /password authentication failed/i.test(message)
+      ? 'The database password in DATABASE_URL is wrong (or [YOUR-PASSWORD] is still in it).'
+      : code === 'ENOTFOUND' || code === 'EAI_AGAIN'
+        ? 'The database address in DATABASE_URL was not found. Copy the Session pooler string again.'
+        : code === 'ETIMEDOUT' || code === 'ECONNREFUSED' || code === 'ENETUNREACH' || code === 'EHOSTUNREACH'
+          ? 'The database did not answer. Use the Session pooler string (not "Direct connection"), check the Supabase project is not paused, and check no firewall blocks port 5432.'
+          : /tenant or user not found/i.test(message)
+            ? 'The user name in DATABASE_URL is wrong: for the pooler it must be postgres.<project-ref>.'
+            : 'Could not connect to the database. Check DATABASE_URL and your internet connection.';
+  return `${reason}\nDetail: ${code ? `${code} ` : ''}${message}`;
 }
