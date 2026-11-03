@@ -22,6 +22,7 @@ type SessionResult = Promise<{ data: { session: MinimalSession | null }; error: 
 /** The part of supabase-js's `auth` client the app uses; tests pass a fake. */
 export type AuthClient = {
   signUp(credentials: { email: string; password: string; options: { emailRedirectTo: string; data: object } }): Promise<{
+    data?: { session: MinimalSession | null } | null;
     error: ErrorLike;
   }>;
   resend(params: { type: 'signup'; email: string; options: { emailRedirectTo: string } }): Promise<{ error: ErrorLike }>;
@@ -61,10 +62,15 @@ export type SignUpInput = { fullName: string; email: string; password: string };
  * account's metadata, so account setup can send them once the email is confirmed (on any phone).
  * Whatever Supabase answers, the app shows the same "check your inbox" step (invariant 3); only a
  * request that never left the phone is reported.
+ *
+ * Exception (C-D9): the shared Supabase project has "Confirm email" switched off, so a new
+ * account comes back already confirmed and signed in, and no email is sent. Then the coach goes
+ * straight on ('signedIn') instead of waiting for a link that never comes. A taken email never
+ * returns a session, so it still gets the "check your inbox" step.
  */
-export async function signUp(deps: AuthDeps, input: SignUpInput): Promise<'sent' | 'offline' | 'unavailable'> {
+export async function signUp(deps: AuthDeps, input: SignUpInput): Promise<'sent' | 'signedIn' | 'offline' | 'unavailable'> {
   try {
-    const { error } = await deps.client.signUp({
+    const { data, error } = await deps.client.signUp({
       email: input.email.trim().toLowerCase(),
       password: input.password,
       options: {
@@ -79,6 +85,7 @@ export async function signUp(deps: AuthDeps, input: SignUpInput): Promise<'sent'
     });
     if (isOffline(error)) return 'offline';
     if (error && (error.status ?? 0) >= 500) return 'unavailable';
+    if (!error && data?.session) return 'signedIn';
     return 'sent';
   } catch {
     return 'offline';

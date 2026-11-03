@@ -32,7 +32,9 @@ export default function SignUp() {
     setProblem(null);
     const result = await signUp(deps, { fullName, email, password });
     setBusy(false);
-    if (result === 'sent') router.replace(`/check-email?email=${encodeURIComponent(email.trim().toLowerCase())}`);
+    // 'signedIn': Supabase confirmed the account at once and sent no email (C-D9); go on as after log in.
+    if (result === 'signedIn') router.replace('/');
+    else if (result === 'sent') router.replace(`/check-email?email=${encodeURIComponent(email.trim().toLowerCase())}`);
     else setProblem(result === 'offline' ? TEXTS.offline : TEXTS.tryLater);
   }
 
