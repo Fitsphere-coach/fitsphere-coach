@@ -13,7 +13,7 @@
 - A person sends a gym request; a 6-digit code is emailed to FitSphere's approval inbox; the FitSphere
   team checks the gym and gives the code to the gym owner; a correct code within 7 days makes the
   person Head Coach, permanently (C-D10).
-- Limits are kept in the settings file (C-D17): 5 wrong tries per code, 3 requests per person per day.
+- Limits are kept as environment variables (C-D17, ADR-0008): 5 wrong tries per code, 3 requests per person per day.
 - Risk: a 6-digit code has only 1,000,000 possibilities. If it could be guessed in the app or read
   from the database, someone could approve a fake gym.
 

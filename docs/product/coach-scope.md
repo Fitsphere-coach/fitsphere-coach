@@ -143,9 +143,11 @@ every phone and after reinstalling the app.
   working.
 - Requests are limited per person per day so the approval inbox cannot be flooded.
 
-### 4.4 Settings kept in a configuration file (C-D17, owner's answer to Q5)
-These values live in **one configuration file** in the coach server, not in the code, so they can be
-changed later by editing the file and restarting the server, with no code change:
+### 4.4 Settings kept outside the code (C-D17, ADR-0008: environment variables)
+These values live as **environment variables** of the coach server (`apps/api/.env`; the host's settings
+in production), not in the code, so they can be
+changed later by editing `apps/api/.env` (or the host's settings) and restarting the server, with no code
+change. Every variable, its starting value and its allowed range are listed in `apps/api/.env.example`:
 
 | Setting | Starting value |
 |---|---|
@@ -166,7 +168,7 @@ changed later by editing the file and restarting the server, with no code change
 ### 4.5 How the approval email is sent (C-D16, ADR-0005 — Accepted)
 - Sent through **Gmail with a Google app password**, from **"FitSphere Coach"
   <appbayaipower@gmail.com>** to the approval inbox `appbayaipower@gmail.com`.
-- Sender email, display name and approval inbox are in the configuration file; the app password is
+- Sender email, display name and approval inbox are environment variables (ADR-0008); the app password is
   in `apps/api/.env` (never in the repo).
 - If an app password cannot be created for that account, another Gmail account can send instead by
   changing the sender email and app password only (ADR-0005, "Fallback").
@@ -240,7 +242,7 @@ changed later by editing the file and restarting the server, with no code change
 | "Set by" label only | Full change log on targets and plans (C-D13) |
 | Sign-up step 3 "Choose your role" | Sign-up step 3 is gym onboarding (C-D10) |
 | "Coaching is off" offers "Switch on coaching" | Every account without a coach role goes to gym onboarding, trainee or not; pending Coach invitations show on the same screen |
-| Limits written in the code | Onboarding and invitation limits live in a configuration file (C-D17) |
+| Limits written in the code | Onboarding and invitation limits live in environment variables (C-D17, ADR-0008) |
 | Either side can end a link; trainees and coaches can leave (REQ-ROLE-014, coach spec LINK-004) | Only the person higher up removes: Head Coach removes Coaches and trainees, Coach removes trainees; Coaches and trainees cannot leave (C-D18) |
 
 ---
@@ -276,7 +278,7 @@ changed later by editing the file and restarting the server, with no code change
 | Q2 | Detect a "completely new email" on the log-in screen? | **Answered:** no. Log in stays as it is; Create account leads to gym onboarding (§4.1). |
 | Q3 | Does an existing FitSphere trainee who logs in follow a different route? | **Answered:** no. Every account without a coach role follows the same gym onboarding route (§4.1). |
 | Q4 | How the server emails the approval code | **Answered:** Gmail with an app password, from `appbayaipower@gmail.com` as "FitSphere Coach" (C-D16, ADR-0005). |
-| Q5 | Wrong-try and request limits | **Answered:** keep them in a configuration file so they change without code (C-D17, §4.4). Starting values: 5 wrong tries, 3 requests a day. |
+| Q5 | Wrong-try and request limits | **Answered:** keep them outside the code (environment variables, ADR-0008) so they change without code (C-D17, §4.4). Starting values: 5 wrong tries, 3 requests a day. |
 | Q6 | Which extra gym fields come next (phone, city, GST number, …) | Open. The form stores extra fields without database changes. |
 | Q7 | Trainees are no longer asked to "Allow" the Head Coach (C-D12). Should trainees be told, or asked, when trainees join? | Open. To be settled in TCR-001 (the trainee agrees to share their data with the gym). |
 | Q8 | Can the same trainee be added twice in one gym, and whose trainee are they when the Head Coach adds them? | **Answered 2026-11-04:** a trainee is added to a gym only once, by their Coach or the Head Coach; a second add shows "This trainee is already added." (C-D19). When the Head Coach adds a trainee, they choose "under myself" or "under a Coach" (C-D21). |

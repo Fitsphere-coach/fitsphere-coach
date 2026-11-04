@@ -19,7 +19,7 @@
 ## Decision criteria
 **Pass/fail gates:**
 1. Works without a domain.
-2. Can send to any inbox named in the settings file.
+2. Can send to any inbox named in the settings (ADR-0008).
 3. The sending password never goes into the repo, the database or logs.
 
 **Weighted criteria:** security 20%, maintainability 20%, reliability 15%, performance 15%,
@@ -51,13 +51,13 @@ scalability 10%, cost 10%, integration 10%.
 ### Settings
 | Setting | Where | Starting value |
 |---|---|---|
-| Sender email | Configuration file (C-D17) | `appbayaipower@gmail.com` |
-| Sender display name | Configuration file | `FitSphere Coach` |
-| Approval inbox | Configuration file | `appbayaipower@gmail.com` |
+| Sender email (`SENDER_EMAIL`) | Environment variable (ADR-0008) | `appbayaipower@gmail.com` |
+| Sender display name (`SENDER_DISPLAY_NAME`) | Environment variable | `FitSphere Coach` |
+| Approval inbox (`APPROVAL_INBOX`) | Environment variable | `appbayaipower@gmail.com` |
 | Sender app password (`SMTP_APP_PASSWORD`) | `apps/api/.env` in development; the hosting secrets manager in production (ADR-0010) | Created by the owner |
 
-- The **password is never in the configuration file**: that file is in the repo (generic code
-  practices SE-1, SE-2). It is never in the database or logs either.
+- The **password is never in the repo**: only in `apps/api/.env` or the host's secrets, and never
+  in `.env.example` with a real value (generic code practices SE-1, SE-2). It is never in the database or logs either.
 - **The sender email and the app password must belong to the same Gmail account**, or Gmail refuses
   to send. The server checks at startup that both are set and fails with a clear message if not
   (DC-5), without printing the password.
@@ -82,7 +82,7 @@ scalability 10%, cost 10%, integration 10%.
 ### Fallback: if an app password cannot be created for `appbayaipower@gmail.com`
 1. Use **another Gmail account** the owner controls (a new one made only for sending is best).
 2. Turn on 2-Step Verification there and create its app password (steps above).
-3. Change two settings, no code change: **Sender email** in the configuration file → the new
+3. Change two settings, no code change: **`SENDER_EMAIL`** → the new
    address; `SMTP_APP_PASSWORD` in `apps/api/.env` → the new account's app password. The display name
    stays FitSphere Coach and the approval inbox stays `appbayaipower@gmail.com`.
 4. Restart the coach server and send one test request.
