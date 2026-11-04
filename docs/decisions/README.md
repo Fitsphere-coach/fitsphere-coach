@@ -25,6 +25,7 @@ numbers.
 | C-D18 | 2026-11-04 | **Only the person higher up adds or removes.** The Head Coach can add and remove Coaches and trainees in the gym; a Coach can add and remove their own trainees. A Coach cannot leave or remove their Head Coach, and a trainee cannot leave or remove their Coach or Head Coach, for now. Adding is always an invitation the person accepts. Supersedes, for the coach app, the trainee repo's REQ-ROLE-014 (leave a coach or Head Coach) and coach spec LINK-004 (either side can end a link). Details: coach-scope §3.4. | Owner (Accepted) |
 | C-D19 | 2026-11-04 | **A trainee is added to a gym only once.** Whether their Coach or the Head Coach adds them, a trainee already in the gym cannot be added again: the app shows "This trainee is already added." and sends nothing. Not a leak under invariant 3, because everyone who can add trainees in that gym already sees that trainee. | Owner (Accepted) |
 | C-D20 | 2026-11-04 | **A removed Coach's trainees are moved first.** Before removing a Coach, the Head Coach moves each of that Coach's trainees to another Coach in the gym or to themselves; the server refuses the removal while the Coach still has trainees. | Owner (Accepted, on Claude's proposal) |
+| C-D21 | 2026-11-04 | **Two options when the Head Coach adds a trainee:** under the Head Coach themselves, or under one of the gym's available Coaches. A Coach always adds trainees under themselves. | Owner (Accepted) |
 
 ## Consequences still to apply
 - **Scope v0.4** (`docs/product/coach-scope.md`, 2026-11-03) replaces the earlier plan for a
