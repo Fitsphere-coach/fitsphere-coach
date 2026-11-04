@@ -9,7 +9,7 @@ gets a new ADR that supersedes the old one.
 |---|---|---|---|
 | [ADR-0001](ADR-0001-system-architecture.md) | System architecture and boundaries | Accepted | 2026-11-04 |
 | [ADR-0002](ADR-0002-database-ownership.md) | Shared database ownership, migrations and where coach data lives | Accepted | 2026-11-04 |
-| ADR-0003 | Sign-in and permissions (roles, gym hierarchy, adding and removing) | Not written yet | — |
+| [ADR-0003](ADR-0003-auth-and-permissions.md) | Sign-in and permissions (roles, gym hierarchy, adding and removing) | Accepted | 2026-11-04 |
 | ADR-0004 | Gym onboarding and approval-code security | Not written yet | — |
 | ADR-0005 | Sending the approval email | Not written yet | — |
 | ADR-0006 | Gym, membership and invitation data model | Not written yet | — |
