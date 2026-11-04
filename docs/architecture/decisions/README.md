@@ -15,5 +15,5 @@ gets a new ADR that supersedes the old one.
 | [ADR-0006](ADR-0006-gym-membership-invitations.md) | Gym, membership and invitation data | Accepted | 2026-11-04 |
 | [ADR-0007](ADR-0007-change-log.md) | Change log for targets, plans and links | Accepted | 2026-11-04 |
 | [ADR-0008](ADR-0008-settings.md) | Settings as environment variables | Accepted | 2026-11-04 |
-| ADR-0009 | Phone app delivery (Expo Go now, app builds later) | Not written yet | — |
+| [ADR-0009](ADR-0009-app-build-and-delivery.md) | How the phone app is built and delivered | Accepted | 2026-11-04 |
 | ADR-0010 | Where the coach server runs | Not written yet | — |
