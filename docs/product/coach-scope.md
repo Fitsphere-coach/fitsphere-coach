@@ -97,6 +97,10 @@ Adding and removing only works **downwards**: the person higher up decides.
 - A person who has a **pending Coach invitation** sees it on the same screen and can accept it
   instead of onboarding a gym (§5).
 
+- **One gym per email (C-D25):** an email that is already a Head Coach gets "This email is already
+  registered as a Head Coach."; an email that is already a Coach gets "This email is already
+  registered as a Coach."
+
 ### 4.2 Steps
 1. **Account:** name, email, password, "I am 18 or older", terms (the existing CF01 sign-up).
 2. **Gym form:** gym name, address, total number of trainees. More fields will be added later; the
