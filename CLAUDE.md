@@ -11,6 +11,22 @@ app. It is a **separate app in its own repo** (decision C-D1) that shares **one 
   this app follows (C-D3).
 - This repo: `pradeepKumawatPalara/fitsphere-coach` (Developer 2).
 
+## Where we are (updated 2026-11-04) — read this first in a new session
+- **Scope of record:** `docs/product/coach-scope.md`; decisions C-D1 to C-D30 in
+  `docs/decisions/README.md`.
+- **ADR-0001 to ADR-0011 are all Accepted** (`docs/architecture/decisions/`): architecture, database
+  ownership, permissions, approval code, approval email (Gmail), gym/membership data, change log,
+  settings as environment variables, app build (Expo Go now, own Expo account later), hosting
+  (Google Cloud Run, Singapore now, Mumbai later: C-D29; ₹500 budget alert), offline and sync
+  (C-D30: leaves Expo Go when the first offline feature is built).
+- **Next step: design the CF02 screens** (gym form, request sent, enter approval code, expired,
+  "already registered as a Head Coach / Coach" messages) and wait for the owner's "UI approved"
+  before building.
+- **Still open:** the owner's CF01 phone check; TCR-001 to TCR-005 are written when their features
+  are designed; the database password was shared in a chat and should be reset (tell Developer 1).
+- The owner prefers **short, simple explanations**, and approves each ADR or screen before it is
+  added to the repo.
+
 ## Current phase (updated 2026-11-03)
 Work moved from the Claude chat to Claude Code in VS Code on the coach developer's PC
 (`C:\fitsphere-coach`). Screen design and specs may still happen in the Claude chat; building,
