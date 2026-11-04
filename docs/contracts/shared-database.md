@@ -21,8 +21,9 @@ These keep the two repos from breaking each other. Changes the trainee app needs
 
 5. **Deleting an account must still work.** Every `coach` table that points at a user uses `on delete cascade` (or is cleaned up by the trainee repo's account deletion), so a user can always be deleted (REQ-ACC-009).
 6. **The same privacy rules in both APIs.** Coach access to trainee data only through an accepted link; the Head Coach as C-D12 and C-D15 define; ending a link ends access to past data too; nothing sensitive in logs (invariants 1 and 6).
-7. **Test on a copy, not the shared project.** Automated tests use a local test database. Migrations go to the shared project only after the pull request is merged.
-8. **Coach migrations only add to schema `coach`.** They never change anything the trainee app uses.
+7. **Separate database logins before real users** (ADR-0002): the coach server gets its own login with full access to `coach`, read on `app`, and write only on the agreed `app` tables; set up by Developer 1 from a change request. The shared login is for development with test accounts only.
+8. **Test on a copy, not the shared project.** Automated tests use a local test database. Migrations go to the shared project only after the pull request is merged.
+9. **Coach migrations only add to schema `coach`.** They never change anything the trainee app uses.
 
 ---
 

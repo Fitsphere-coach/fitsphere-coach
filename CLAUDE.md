@@ -43,6 +43,7 @@ must be merged.
 
 ## Sources of truth
 - Decisions for this repo (C-D IDs): `docs/decisions/README.md`
+- Architecture Decision Records (ADR-0001 …): `docs/architecture/decisions/` — follow every Accepted ADR
 - **Scope of record: `docs/product/coach-scope.md` (v0.4)** — roles, gym onboarding, permissions,
   feature plan and the owner's open questions (§11). Read it before any feature work.
 - Coach product spec (detailed requirements, IDs CAUTH-, TRNE-, CTGT-, CDIET-, MON- …):
