@@ -1,6 +1,6 @@
 # Feature board — FitSphere Coach
 
-Scope of record: `docs/product/coach-scope.md` (v0.4). One feature at a time: UI designed → owner approves → build (API, database, screens, tests) → owner
+Scope of record: `docs/product/coach-scope.md` (v0.4). Trainee-app change requests (TCR) for Developer 1: `docs/handoff/trainee-app/` (C-D22). One feature at a time: UI designed → owner approves → build (API, database, screens, tests) → owner
 tries it on the phone → DONE.
 
 | # | Feature | Spec IDs | Status |
@@ -10,10 +10,10 @@ tries it on the phone → DONE.
 | CF01b | Accepting a coach invite (link and in-app card) — built with CF03 | CAUTH-002 | Moved to CF03 |
 | CF02 | **Gym onboarding and FitSphere approval code** (scope v0.4 §4, C-D10): gym form, request, 6-digit code emailed to the approval inbox, enter code, 7-day expiry. Owner's answers recorded (coach-scope §11); needs C-D16 accepted and approved screens | — | **Next** |
 | CF03 | Head Coach invites Coaches (invitation only, C-D11), "already a Coach" check (C-D14), accept; Head Coach removes Coaches after moving their trainees (C-D20), Coaches cannot leave (C-D18) | — | After CF02 |
-| CF04 | Coach or Head Coach adds and removes trainees (C-D18), once per gym (C-D19); Head Coach adds under self or under a Coach (C-D21); trainee list and profile; Head Coach sees each trainee's Coach — **blocked by C-D7** (needs trainee links) | TRNE-*, TPRO-* | Not started |
-| CF05 | Targets by Coach or Head Coach, with change log (C-D13) — **blocked by C-D7** | CTGT-* | Not started |
-| CF06 | Exercise library and training plans, with change log — **blocked by C-D7** | EXL-*, CTRN-* | Not started |
-| CF07 | Diet plans, with change log — **blocked by C-D7** | CDIET-* | Not started |
+| CF04 | Coach or Head Coach adds and removes trainees (C-D18), once per gym (C-D19); Head Coach adds under self or under a Coach (C-D21); trainee list and profile; Head Coach sees each trainee's Coach — needs **TCR-001** (Developer 1) | TRNE-*, TPRO-* | Not started |
+| CF05 | Targets by Coach or Head Coach, with change log (C-D13) — needs **TCR-002** (Developer 1) | CTGT-* | Not started |
+| CF06 | Exercise library and training plans, with change log — needs **TCR-003** (Developer 1) | EXL-*, CTRN-* | Not started |
+| CF07 | Diet plans, with change log — needs **TCR-004** (Developer 1) | CDIET-* | Not started |
 | CF08 | Templates | TPL-* | Not started |
 | CF09 | Dashboard, adherence, flags, activity | MON-001…004 | Not started |
 | CF10 | Notes, comments, notifications | COMM-001…003 | Not started |

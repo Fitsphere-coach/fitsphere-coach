@@ -32,8 +32,10 @@ running and fixing happen here.
   log in never reveals whether an email exists; limits live in a configuration file (C-D17). Do not
   build CF02 until the owner accepts **C-D16** (approval email sent through Gmail with an app
   password), then design its screens and wait for "UI approved".
-- **Blocked by C-D7 (owner to decide):** the trainee side of CF03 (a trainee accepting an invite),
-  CF04, and coach-set targets and plans (CF05–CF07).
+- **Trainee-app changes (C-D22, 2026-11-04):** the trainee side of CF03 (a trainee accepting an
+  invite), CF04 and coach-set targets and plans (CF05–CF07) need the trainee app to change. Build
+  the coach side here, and write the trainee side as a change request for Developer 1
+  (`docs/handoff/trainee-app/`). Never edit the trainee app.
 
 On this PC: install packages with `npm ci` (not `npm install`, which rewrites
 `package-lock.json` on Windows). Never commit `.env` files. Before `npm run migrate`, the change
@@ -51,6 +53,7 @@ must be merged.
 - Design system: `docs/design/design-system.md`; locked feature UI docs: `docs/design/CF*.md`
 - Feature board: `docs/features/README.md`
 - Runbook (setup, configuration names, commands): `docs/operations/runbook.md`
+- Trainee-app change requests for Developer 1 (TCR IDs, C-D22): `docs/handoff/trainee-app/`
 - Always-on invariants: `.claude/rules/project-invariants.md`
 
 ## Organisation standards — follow on every task
@@ -66,7 +69,7 @@ plan, code, test, review or decide, and follow them on every task:
 | Starting the application with Claude Code (process guide) | `docs/standards/starting-with-claude-code.md` | Setting up tooling and the per-feature "done" checklist |
 
 How to apply them:
-- **Precedence when rules conflict:** law and security, then this file's project rules (C-D7, the
+- **Precedence when rules conflict:** law and security, then this file's project rules (C-D22, the
   shared database rules, the invariants and Accepted C-D decisions), then the project's existing
   conventions, then these standards. Name any conflict in the pull request instead of choosing
   silently (generic code practices, "How to read this file").
@@ -89,25 +92,32 @@ How to apply them:
   `apps/api/src/auth.ts`, and every route declares an access rule in `apps/api/src/access.ts`.
 - Database: the shared Supabase PostgreSQL. This repo owns schema **`coach`** only.
 
-## No impact on the trainee app (C-D7) — highest priority
-Never suggest or make a change that affects Developer 1 or the trainee app (`fitsphere` repo,
-schema `app`, its migrations, its API or its app). In particular:
-- no edits, branches or pull requests in the `fitsphere` repo, and no requests for Developer 1 to
-  change anything;
-- no change to how existing `app` data looks to the trainee app: the coach API writes to `app`
-  only rows the trainee app already ignores, or does not write at all;
-- coach work lives only in this repo and schema `coach`.
-If a coach feature cannot work without a trainee-app change (for example, a trainee accepting an
-invite or seeing coach-set targets), stop and tell the owner; never plan that change yourself.
+## Trainee-app changes go through Developer 1 (C-D22) — highest priority
+**Never edit the trainee app**: no edits, branches or pull requests in the `fitsphere` repo, and no
+change to schema `app`, its migrations, its API or its screens. That is Developer 1's work.
+
+When a coach feature needs the trainee app to change (for example a trainee accepting a coach,
+showing coach plans, locking coach-set targets):
+1. Build the coach side in this repo as usual.
+2. Write a **trainee-app change request** in `docs/handoff/trainee-app/` (one file per request,
+   template in its README) with every detail Developer 1 needs: why, user flow, screens and states,
+   exact copy, data (tables, columns, migrations in schema `app`), API changes, rules and
+   permissions, acceptance criteria, tests, and how the coach side depends on it. Developer 1 must
+   be able to build it without asking.
+3. The owner reviews it and gives it to Developer 1. Claude never contacts Developer 1 or opens
+   anything in the `fitsphere` repo.
+4. The coach feature goes live only after Developer 1's change is merged and applied; until then it
+   stays off behind its dependency.
+5. Changes to schema `app` (new tables or columns, even ones only the coach app uses) are always
+   part of a change request; this repo never migrates `app`.
 
 ## Shared database rules (summary — the contract has the full text)
 1. This repo creates and changes tables **only in schema `coach`**. Never create, alter or drop
-   anything in schema `app`. If a coach feature seems to need an `app` change, stop and tell
-   the owner (C-D7).
+   anything in schema `app`. An `app` change is written as a trainee-app change request (C-D22).
 2. Migrations are `apps/api/migrations/C0001_name.sql`, recorded in `coach.schema_migrations`.
    A file that was applied is never edited; add a new one.
-3. The API writes to `app` only what the contract allows and C-D7 permits (rows the trainee app
-   ignores); everything else in `app` is read-only, and only through the access rules.
+3. The API writes to `app` only the tables and rows the contract allows; everything else in `app`
+   is read-only, and only through the access rules.
 4. Every `coach` table that points at a user cascades on delete, so account deletion keeps working.
 5. Tests use a local or CI database, never Supabase. Migrations reach the shared project only after
    the pull request is merged, and only when the owner says so. They add tables in schema `coach`

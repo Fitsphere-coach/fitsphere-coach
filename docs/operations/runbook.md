@@ -49,7 +49,7 @@ Redirect URLs** (click **Add URL** for each):
 
 This only **adds** entries to the list. Keep every existing entry (the trainee app's
 `fitsphere://**` and any others) exactly as it is, and change nothing else on that page, so the
-trainee app is not affected (C-D7). Both apps send the same emails, with the same wording.
+trainee app is not affected (C-D22). Both apps send the same emails, with the same wording.
 
 ## 6. Trying CF01 on your phone
 1. After the CF01 pull request is merged: `npm run migrate -w @fitsphere-coach/api` (adds C0002: coach names and coach terms; schema `coach` only).
