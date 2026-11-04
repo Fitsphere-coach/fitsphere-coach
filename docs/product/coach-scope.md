@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| **Version** | 0.4.1 — 2026-11-04 (adds who can add and remove whom, §3.4) |
-| **Status** | Owner's scope refinement of 2026-11-03 and 2026-11-04 (decisions C-D10 to C-D18), with the owner's answers of the same day (§11). C-D16 (how the approval email is sent) is **Proposed** until the owner accepts it. |
+| **Version** | 0.4.1 — 2026-11-04 (adds who can add and remove whom, a trainee once per gym, and moving a removed Coach's trainees, §3.4) |
+| **Status** | Owner's scope refinement of 2026-11-03 and 2026-11-04 (decisions C-D10 to C-D20), with the owner's answers of the same day (§11). C-D16 (how the approval email is sent) is **Proposed** until the owner accepts it. |
 | **Authority** | This file is the scope of record. Where `coach-spec.md` (v0.3) disagrees, this file wins. Project rules in `CLAUDE.md` (C-D7 first) still win over both. |
 
 ---
@@ -68,6 +68,15 @@ Adding and removing only works **downwards**: the person higher up decides.
 - A trainee cannot leave or remove their Coach or Head Coach, for now. Only a Coach or the Head Coach can remove a trainee.
 - "Add" always means sending an invitation that the person accepts (§5); nobody is added without accepting.
 - Removing someone ends the link: the remover loses all access to that person's data, including past data, and no data is deleted.
+- **A trainee is added to a gym only once** (C-D19). If the trainee is already in the gym, whether
+  added by their Coach or by the Head Coach, a second add shows **"This trainee is already added."**
+  and sends nothing. This reveals nothing new: everyone who can add trainees in that gym can already
+  see that trainee.
+- When the Head Coach adds a trainee, the Head Coach chooses which of the gym's Coaches the trainee
+  belongs to, or keeps the trainee as their own (Proposed, §11 Q8).
+- **Before removing a Coach, the Head Coach moves every one of that Coach's trainees** to another
+  Coach in the gym or to themselves (C-D20). The removal is refused while the Coach still has
+  trainees, so no trainee is ever left without a coach.
 - Adding and removing trainees waits for the trainee side (§6, C-D7).
 
 ---
@@ -253,5 +262,5 @@ changed later by editing the file and restarting the server, with no code change
 | Q5 | Wrong-try and request limits | **Answered:** keep them in a configuration file so they change without code (C-D17, §4.4). Starting values: 5 wrong tries, 3 requests a day. |
 | Q6 | Which extra gym fields come next (phone, city, GST number, …) | Open. The form stores extra fields without database changes. |
 | Q7 | Trainees are no longer asked to "Allow" the Head Coach (C-D12). Should trainees be told, or asked, when trainees join? | Open. Recorded as a privacy item for when the trainee side is unblocked (C-D7). |
-| Q8 | When the Head Coach adds a trainee, whose trainee are they? | Open. Proposed: the Head Coach picks one of the gym's Coaches, or keeps the trainee as their own. |
-| Q9 | When the Head Coach removes a Coach, what happens to that Coach's trainees? | Open. Proposed: the Head Coach moves them to another Coach or to themselves before the removal completes, so no trainee is left without a coach. |
+| Q8 | Can the same trainee be added twice in one gym, and whose trainee are they when the Head Coach adds them? | **Answered 2026-11-04:** a trainee is added to a gym only once, by their Coach or the Head Coach; a second add shows "This trainee is already added." (C-D19). Still **Proposed**: the Head Coach chooses which Coach the trainee belongs to, or keeps them. |
+| Q9 | When the Head Coach removes a Coach, what happens to that Coach's trainees? | **Answered 2026-11-04:** the Head Coach first moves them to another Coach or to themselves; removal is refused until the Coach has no trainees (C-D20). |
