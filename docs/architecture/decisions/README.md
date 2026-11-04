@@ -12,7 +12,7 @@ gets a new ADR that supersedes the old one.
 | [ADR-0003](ADR-0003-auth-and-permissions.md) | Sign-in and permissions (roles, gym hierarchy, adding and removing) | Accepted | 2026-11-04 |
 | [ADR-0004](ADR-0004-gym-onboarding-approval-code.md) | Gym onboarding and approval-code security | Accepted | 2026-11-04 |
 | [ADR-0005](ADR-0005-approval-email.md) | Sending the approval email | Accepted | 2026-11-04 |
-| ADR-0006 | Gym, membership and invitation data model | Not written yet | — |
+| [ADR-0006](ADR-0006-gym-membership-invitations.md) | Gym, membership and invitation data | Accepted | 2026-11-04 |
 | ADR-0007 | Change log for targets and plans | Not written yet | — |
 | ADR-0008 | Settings in a configuration file | Not written yet | — |
 | ADR-0009 | Phone app delivery (Expo Go now, app builds later) | Not written yet | — |
