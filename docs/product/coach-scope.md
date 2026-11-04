@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Version** | 0.4.1 — 2026-11-04 (adds who can add and remove whom, a trainee once per gym, and moving a removed Coach's trainees, §3.4) |
-| **Status** | Owner's scope refinement of 2026-11-03 and 2026-11-04 (decisions C-D10 to C-D21), with the owner's answers of the same day (§11). C-D16 (how the approval email is sent) is **Proposed** until the owner accepts it. |
+| **Status** | Owner's scope refinement of 2026-11-03 and 2026-11-04 (decisions C-D10 to C-D21), with the owner's answers of the same day (§11). C-D16 accepted by ADR-0005. |
 | **Authority** | This file is the scope of record. Where `coach-spec.md` (v0.3) disagrees, this file wins. Project rules in `CLAUDE.md` (C-D22 first) still win over both. |
 
 ---
@@ -150,6 +150,8 @@ changed later by editing the file and restarting the server, with no code change
 | Setting | Starting value |
 |---|---|
 | Approval inbox (where codes are emailed) | `appbayaipower@gmail.com` |
+| Sender email | `appbayaipower@gmail.com` |
+| Sender display name | `FitSphere Coach` |
 | Code length | 6 digits |
 | Days a request stays valid | 7 |
 | Wrong tries allowed per code | 5 |
@@ -161,18 +163,13 @@ changed later by editing the file and restarting the server, with no code change
   sensible range (generic code practices DC-5).
 - The file holds **no secrets**. Passwords for sending email stay in `apps/api/.env`.
 
-### 4.5 How the approval email is sent (C-D16, Proposed until the owner accepts)
-- FitSphere has **no website domain**, so services that need one (for example Resend) are not an
-  option now (owner's answer to Q4).
-- **Proposed:** the coach server sends the email through **Gmail**, signed in to a Gmail account
-  with a Google **app password** (a separate password Google creates for one app). The sending
-  account can be `appbayaipower@gmail.com` itself, emailing its own inbox.
-- The Gmail address and app password are kept only in `apps/api/.env`, never in the repo or logs.
-- Limits to know: Gmail allows a few hundred emails a day from one account, which is far more than
-  gym requests need; Google may block sign-in if the app password is removed.
-- Supabase's own emails cannot be used: they only send sign-in emails to the account's own address.
-- If FitSphere gets a domain later, the sender can move to a service such as Resend by changing the
-  email settings, without changing the onboarding feature.
+### 4.5 How the approval email is sent (C-D16, ADR-0005 — Accepted)
+- Sent through **Gmail with a Google app password**, from **"FitSphere Coach"
+  <appbayaipower@gmail.com>** to the approval inbox `appbayaipower@gmail.com`.
+- Sender email, display name and approval inbox are in the configuration file; the app password is
+  in `apps/api/.env` (never in the repo).
+- If an app password cannot be created for that account, another Gmail account can send instead by
+  changing the sender email and app password only (ADR-0005, "Fallback").
 
 ---
 
@@ -222,7 +219,7 @@ changed later by editing the file and restarting the server, with no code change
 |---|---|---|
 | CF00 | Foundation | Done |
 | CF01 | Sign-in, sign-up, passwords, log out | Built; phone check in progress. Sign-up's next step changes to gym onboarding (CF02). "Coaching is off" changes to "Onboard your gym / wait for an invitation". |
-| **CF02** | **Gym onboarding and FitSphere approval code** (§4) | **Next** — owner accepts C-D16, then screens are designed and approved |
+| **CF02** | **Gym onboarding and FitSphere approval code** (§4) | **Next** — screens to be designed and approved |
 | CF03 | Head Coach invites Coaches; Coach accepts; "already a Coach" check; Head Coach removes a Coach; Coaches cannot leave (§5, §3.4) | After CF02 |
 | CF04 | Coach or Head Coach adds and removes trainees; trainee list and profile; Head Coach sees each trainee's Coach (§3.4) | Coach side, then TCR-001 |
 | CF05 | Targets (Coach and Head Coach) with change log | Coach side, then TCR-002 |
@@ -278,7 +275,7 @@ changed later by editing the file and restarting the server, with no code change
 | Q1 | What "Head Coach can perform every task over the coach that a coach can perform over the trainee" means | **Answered 2026-11-03:** the Head Coach can do everything a Coach does for the Coach's trainees (see data, set targets and plans), and also invites, lists and removes Coaches. Never sees or sets a Coach's own personal training (C-D12, C-D15). |
 | Q2 | Detect a "completely new email" on the log-in screen? | **Answered:** no. Log in stays as it is; Create account leads to gym onboarding (§4.1). |
 | Q3 | Does an existing FitSphere trainee who logs in follow a different route? | **Answered:** no. Every account without a coach role follows the same gym onboarding route (§4.1). |
-| Q4 | How the server emails the approval code | **Answered:** FitSphere has no domain. **Proposed** answer: Gmail with an app password (C-D16, §4.5); waits for the owner's acceptance. |
+| Q4 | How the server emails the approval code | **Answered:** Gmail with an app password, from `appbayaipower@gmail.com` as "FitSphere Coach" (C-D16, ADR-0005). |
 | Q5 | Wrong-try and request limits | **Answered:** keep them in a configuration file so they change without code (C-D17, §4.4). Starting values: 5 wrong tries, 3 requests a day. |
 | Q6 | Which extra gym fields come next (phone, city, GST number, …) | Open. The form stores extra fields without database changes. |
 | Q7 | Trainees are no longer asked to "Allow" the Head Coach (C-D12). Should trainees be told, or asked, when trainees join? | Open. To be settled in TCR-001 (the trainee agrees to share their data with the gym). |
