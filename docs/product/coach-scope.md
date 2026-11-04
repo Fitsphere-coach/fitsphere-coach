@@ -4,7 +4,7 @@
 |---|---|
 | **Version** | 0.4.1 — 2026-11-04 (adds who can add and remove whom, a trainee once per gym, and moving a removed Coach's trainees, §3.4) |
 | **Status** | Owner's scope refinement of 2026-11-03 and 2026-11-04 (decisions C-D10 to C-D21), with the owner's answers of the same day (§11). C-D16 (how the approval email is sent) is **Proposed** until the owner accepts it. |
-| **Authority** | This file is the scope of record. Where `coach-spec.md` (v0.3) disagrees, this file wins. Project rules in `CLAUDE.md` (C-D7 first) still win over both. |
+| **Authority** | This file is the scope of record. Where `coach-spec.md` (v0.3) disagrees, this file wins. Project rules in `CLAUDE.md` (C-D22 first) still win over both. |
 
 ---
 
@@ -80,7 +80,7 @@ Adding and removing only works **downwards**: the person higher up decides.
 - **Before removing a Coach, the Head Coach moves every one of that Coach's trainees** to another
   Coach in the gym or to themselves (C-D20). The removal is refused while the Coach still has
   trainees, so no trainee is ever left without a coach.
-- Adding and removing trainees waits for the trainee side (§6, C-D7).
+- Adding and removing trainees needs the trainee app's side first (§6, C-D22).
 
 ---
 
@@ -182,7 +182,7 @@ changed later by editing the file and restarting the server, with no code change
 - Otherwise:
   - an email with no FitSphere account gets an invitation email with a link to join;
   - an email that is a FitSphere trainee account gets the invitation inside the coach app when they
-    log in there with that account (the trainee app is not changed, C-D7).
+    log in there with that account (no trainee-app change needed).
 - Invitations expire after 7 days; at most 20 per Head Coach per day; they can be resent or
   cancelled.
 - Accepting makes the person a Coach in that gym. If they are already a FitSphere trainee, their
@@ -193,9 +193,22 @@ changed later by editing the file and restarting the server, with no code change
 
 ## 6. Trainees
 - Trainees use only the FitSphere (trainee) app.
-- **Blocked by C-D7 (owner to decide):** a trainee accepting a Coach's invitation, trainees seeing
-  coach-set targets and plans, and therefore any Coach or Head Coach access to trainee data. Each of
-  these needs a change to the trainee app.
+- **Everything a coach creates must reach the trainee app, and the coach app must read the trainee's
+  progress.** The trainee app needs these changes, built by Developer 1 from change requests the
+  coach team writes in full (C-D22, `docs/handoff/trainee-app/`):
+
+| # | Trainee-app change | Needed by |
+|---|---|---|
+| TCR-001 | A trainee added by a Coach or Head Coach can log in to the FitSphere app; the trainee accepts the gym and agrees to share their data (consent recorded) | CF04 and everything after it |
+| TCR-002 | Coach-set targets show in the trainee app, labelled "Set by <name>", and the trainee cannot change them | CF05 |
+| TCR-003 | The coach's training plan shows in the Training tab; the trainee follows it and logs workouts against it | CF06 |
+| TCR-004 | The coach's diet plan shows in the Diet plan tab; the trainee logs a plan option as a meal | CF07 |
+
+- The coach app reads the trainee's logs (food, workouts, weight, steps, sleep, measurements) from
+  the shared database through the coach server; this needs no trainee-app change once TCR-001 has
+  linked the trainee.
+- Where coach plans are stored (schema `coach` or schema `app`) is decided in the data ADRs. Any new
+  `app` table is part of the matching change request.
 
 ---
 
@@ -207,10 +220,10 @@ changed later by editing the file and restarting the server, with no code change
 | CF01 | Sign-in, sign-up, passwords, log out | Built; phone check in progress. Sign-up's next step changes to gym onboarding (CF02). "Coaching is off" changes to "Onboard your gym / wait for an invitation". |
 | **CF02** | **Gym onboarding and FitSphere approval code** (§4) | **Next** — owner accepts C-D16, then screens are designed and approved |
 | CF03 | Head Coach invites Coaches; Coach accepts; "already a Coach" check; Head Coach removes a Coach; Coaches cannot leave (§5, §3.4) | After CF02 |
-| CF04 | Coach or Head Coach adds and removes trainees; trainee list and profile; Head Coach sees each trainee's Coach (§3.4) | Blocked by C-D7 (needs trainee links) |
-| CF05 | Targets (Coach and Head Coach) with change log | Blocked by C-D7 |
-| CF06 | Training plans with change log | Blocked by C-D7 |
-| CF07 | Diet plans with change log | Blocked by C-D7 |
+| CF04 | Coach or Head Coach adds and removes trainees; trainee list and profile; Head Coach sees each trainee's Coach (§3.4) | Coach side, then TCR-001 |
+| CF05 | Targets (Coach and Head Coach) with change log | Coach side, then TCR-002 |
+| CF06 | Training plans with change log | Coach side, then TCR-003 |
+| CF07 | Diet plans with change log | Coach side, then TCR-004 |
 | CF08 – CF12 | Templates, dashboard, notes, check-ins, reports | Later |
 
 ---
@@ -240,12 +253,12 @@ changed later by editing the file and restarting the server, with no code change
 - **Coach invitations:** email, gym, token hash, status, expiry.
 - **Change log:** who changed which target or plan, when, and what changed (built with CF05–CF07).
 - Head Coach and Coach roles are also written as rows in the shared `app.user_roles` table, exactly
-  as the shared database contract allows. Nothing else in schema `app` changes (C-D7).
+  as the shared database contract allows. Any other `app` change is a trainee-app change request (C-D22).
 
 ---
 
 ## 10. Rules that do not change
-- No impact on the trainee app (C-D7) stays the highest-priority rule.
+- Developer 2 never edits the trainee app; its changes go to Developer 1 as change requests (C-D22). This stays the highest-priority rule.
 - All permission checks happen on the coach server; hiding a button is never protection.
 - A Head Coach never sees a Coach's personal training data.
 - Passwords, tokens, approval codes, emails and health data never appear in logs.
@@ -264,6 +277,6 @@ changed later by editing the file and restarting the server, with no code change
 | Q4 | How the server emails the approval code | **Answered:** FitSphere has no domain. **Proposed** answer: Gmail with an app password (C-D16, §4.5); waits for the owner's acceptance. |
 | Q5 | Wrong-try and request limits | **Answered:** keep them in a configuration file so they change without code (C-D17, §4.4). Starting values: 5 wrong tries, 3 requests a day. |
 | Q6 | Which extra gym fields come next (phone, city, GST number, …) | Open. The form stores extra fields without database changes. |
-| Q7 | Trainees are no longer asked to "Allow" the Head Coach (C-D12). Should trainees be told, or asked, when trainees join? | Open. Recorded as a privacy item for when the trainee side is unblocked (C-D7). |
+| Q7 | Trainees are no longer asked to "Allow" the Head Coach (C-D12). Should trainees be told, or asked, when trainees join? | Open. To be settled in TCR-001 (the trainee agrees to share their data with the gym). |
 | Q8 | Can the same trainee be added twice in one gym, and whose trainee are they when the Head Coach adds them? | **Answered 2026-11-04:** a trainee is added to a gym only once, by their Coach or the Head Coach; a second add shows "This trainee is already added." (C-D19). When the Head Coach adds a trainee, they choose "under myself" or "under a Coach" (C-D21). |
 | Q9 | When the Head Coach removes a Coach, what happens to that Coach's trainees? | **Answered 2026-11-04:** the Head Coach first moves them to another Coach or to themselves; removal is refused until the Coach has no trainees (C-D20). |
