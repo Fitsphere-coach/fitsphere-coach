@@ -17,3 +17,4 @@ gets a new ADR that supersedes the old one.
 | [ADR-0008](ADR-0008-settings.md) | Settings as environment variables | Accepted | 2026-11-04 |
 | [ADR-0009](ADR-0009-app-build-and-delivery.md) | How the phone app is built and delivered | Accepted | 2026-11-04 |
 | [ADR-0010](ADR-0010-server-hosting.md) | Where the coach server runs | Accepted | 2026-11-04 |
+| [ADR-0011](ADR-0011-offline-and-sync.md) | Offline use and sync | Accepted | 2026-11-04 |
