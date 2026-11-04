@@ -2,7 +2,7 @@
 
 Always-on rules for any change in this repo. Rules 1 to 7 are the trainee app's invariants
 (`fitsphere/.claude/rules/project-invariants.md`), which both apps must keep because they share
-one database. Rules 8 to 10 come from the shared database contract; rules 11 to 17 from scope v0.4
+one database. Rules 8 to 10 come from the shared database contract; rules 11 to 18 from scope v0.4
 (`docs/product/coach-scope.md`).
 
 1. **Authorization is server-side.** A coach sees a trainee's data only through an **accepted**
@@ -33,3 +33,4 @@ one database. Rules 8 to 10 come from the shared database contract; rules 11 to 
     added."
 16. **A Coach with trainees cannot be removed** (C-D20). The Head Coach moves the trainees first.
 17. **A Coach is never a trainee in their own gym** (C-D24, ADR-0003). Such an add is refused.
+18. **One gym per email** (C-D25, ADR-0004). A Head Coach or a Coach cannot send a gym request.
