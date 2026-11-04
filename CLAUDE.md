@@ -25,7 +25,8 @@ running and fixing happen here.
   off"; log in errors; forgot/change password; log out). Fix what it finds, one PR per fix.
 - **Scope changed on 2026-11-03 (v0.4, `docs/product/coach-scope.md`, C-D10 to C-D15):** gyms are
   onboarded and approved by FitSphere with a 6-digit code emailed to `appbayaipower@gmail.com`;
-  Coaches join only by a Head Coach's invitation; Head Coach powers; change log on plans.
+  Coaches join only by a Head Coach's invitation; Head Coach powers; change log on plans;
+  only the person higher up adds or removes (C-D18, 2026-11-04).
 - **Next feature: CF02 — gym onboarding and FitSphere approval code.** The owner answered
   coach-scope §11 Q1–Q5. Every account without a coach role, trainee or not, goes to gym onboarding;
   log in never reveals whether an email exists; limits live in a configuration file (C-D17). Do not

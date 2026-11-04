@@ -2,7 +2,7 @@
 
 Always-on rules for any change in this repo. Rules 1 to 7 are the trainee app's invariants
 (`fitsphere/.claude/rules/project-invariants.md`), which both apps must keep because they share
-one database. Rules 8 to 10 come from the shared database contract; rules 11 to 13 from scope v0.4
+one database. Rules 8 to 10 come from the shared database contract; rules 11 to 14 from scope v0.4
 (`docs/product/coach-scope.md`).
 
 1. **Authorization is server-side.** A coach sees a trainee's data only through an **accepted**
@@ -26,3 +26,6 @@ one database. Rules 8 to 10 come from the shared database contract; rules 11 to 
     codes are stored only as hashes and never shown, returned or logged.
 12. **Coaches join only by invitation** (C-D11). There is no self sign-up as Coach.
 13. **Every change to a trainee's targets or plans is logged with who and when** (C-D13).
+14. **Only the person higher up adds or removes** (C-D18): Head Coach → Coaches and trainees; Coach →
+    their trainees. A Coach cannot remove their Head Coach; a trainee cannot remove their Coach or
+    Head Coach. The server refuses any such request, whatever the app shows.
