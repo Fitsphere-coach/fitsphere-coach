@@ -29,7 +29,7 @@ running and fixing happen here.
   only the person higher up adds or removes (C-D18, 2026-11-04).
 - **Next feature: CF02 — gym onboarding and FitSphere approval code.** The owner answered
   coach-scope §11 Q1–Q5. Every account without a coach role, trainee or not, goes to gym onboarding;
-  log in never reveals whether an email exists; limits live in a configuration file (C-D17). C-D16 is
+  log in never reveals whether an email exists; limits and email settings live in environment variables (C-D17, ADR-0008). C-D16 is
   accepted (ADR-0005: Gmail with an app password). Design CF02's screens and wait for "UI approved"
   before building.
 - **Trainee-app changes (C-D22, 2026-11-04):** the trainee side of CF03 (a trainee accepting an
