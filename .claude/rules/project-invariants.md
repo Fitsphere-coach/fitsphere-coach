@@ -8,8 +8,9 @@ one database. Rules 8 to 10 come from the shared database contract; rules 11 to 
 1. **Authorization is server-side.** A coach sees a trainee's data only through an **accepted**
    link. A Head Coach can do for every trainee of the gym's Coaches what a Coach can do (C-D12)
    and sees each trainee's Coach, but **never** a Coach's own personal training
-   data (C-D15). Ending a link ends access to all of that person's data, including past data.
-   UI hiding is not access control.
+   data (C-D15). Ending a link ends access to the trainee's **new** data. Data up to the day the
+   link ended stays readable by the gym, read-only (C-D28) — only once the FitSphere app's consent
+   text covers it (TCR-001) and Legal has reviewed it. UI hiding is not access control.
 2. **A trainee cannot edit coach-set targets; coach input wins** (REQ-PLAN-001, coach spec CQ-04).
 3. **Invitations never reveal whether an email is registered** (REQ-ROLE-011, D-11). One owner-approved
    exception: inviting an email that already has the Coach role shows "already available as a Coach"

@@ -26,8 +26,8 @@ the owner reviews it, and the owner gives it to Developer 1, who builds it in th
 
 | ID | Change in the trainee app | Needed by | Status |
 |---|---|---|---|
-| TCR-001 | Joining a gym (C-D23): the trainee creates their own account; on log in an Accept/Decline pop-up for the gym's invitation; accepting records consent (covering the gym, C-D26) and creates the link; tables `app.coach_invitations` and `app.coach_consents` (ADR-0006) | CF04 | Not written yet |
-| TCR-002 | Coach-set targets: shown with "Set by <name>", locked for the trainee | CF05 | Not written yet |
+| TCR-001 | Joining a gym (C-D23): the trainee creates their own account; on log in an Accept/Decline pop-up for the gym's invitation; accepting records consent (covering the gym, C-D26, and the gym's read access to past data after the link ends, C-D28) and creates the link; tables `app.coach_invitations` and `app.coach_consents` (ADR-0006) | CF04 | Not written yet |
+| TCR-002 | Coach-set targets override the trainee's own (C-D27): shown with "Set by <name> (HC)" or "(C)", locked for the trainee; stay read-only after the link ends | CF05 | Not written yet |
 | TCR-003 | Coach training plan in the Training tab; workouts logged against it | CF06 | Not written yet |
 | TCR-004 | Coach diet plan in the Diet plan tab; a plan option logged as a meal | CF07 | Not written yet |
 | TCR-005 | Separate database login for the coach server (its `app` permissions), ADR-0002 | Before the first real user | Not written yet |
