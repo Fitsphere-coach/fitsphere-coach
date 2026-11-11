@@ -7,8 +7,10 @@ import type { Auth } from './auth.ts';
 import { errorBody, handleError } from './errors.ts';
 import type { OnboardingDeps } from './onboarding.ts';
 import { registerClientRoutes } from './routes/clients.ts';
+import { registerDietRoutes } from './routes/diet.ts';
 import { registerGymRoutes } from './routes/gym.ts';
 import { registerMeRoutes } from './routes/me.ts';
+import { registerWorkoutRoutes } from './routes/workouts.ts';
 
 export type LogOptions = { level: string; stream?: { write(line: string): void } };
 
@@ -71,6 +73,8 @@ export function buildApp(deps: AppDeps) {
   registerMeRoutes(app, deps);
   registerGymRoutes(app, deps);
   registerClientRoutes(app, deps);
+  registerWorkoutRoutes(app, deps);
+  registerDietRoutes(app, deps);
 
   return app;
 }

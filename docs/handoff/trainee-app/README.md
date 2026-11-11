@@ -28,8 +28,8 @@ the owner reviews it, and the owner gives it to Developer 1, who builds it in th
 |---|---|---|---|
 | TCR-001 | Joining a gym (C-D23): the trainee creates their own account; on log in an Accept/Decline pop-up for the gym's invitation; accepting records consent (covering the gym, C-D26, and the gym's read access to past data after the link ends, C-D28) and creates the link; tables `app.coach_invitations` and `app.coach_consents` (ADR-0006); the trainee's name (`app.users.full_name`) | CF04 | **Ready for owner** (`TCR-001-joining-a-gym.md`, 2026-11-11; five open questions in §11) |
 | TCR-002 | Coach-set targets override the trainee's own (C-D27): shown with "Set by <name> (HC)" or "(C)", locked for the trainee; stay read-only after the link ends | CF05 | Not written yet |
-| TCR-003 | Coach training plan in the Training tab; workouts logged against it | CF06 | Not written yet |
-| TCR-004 | Coach diet plan in the Diet plan tab; a plan option logged as a meal | CF07 | Not written yet |
+| TCR-003 | Coach training plan in the Training tab; workouts logged against it | CF06 | **Ready for owner** (`TCR-003-training-plans.md`, 2026-11-11; CF06 answers are in; open questions in §12) |
+| TCR-004 | Coach diet plan in the Diet plan tab; a plan option logged as a meal | CF07 | **Ready for owner** (`TCR-004-diet-plans.md`, 2026-11-11; four open questions in §12) |
 | TCR-005 | Separate database login for the coach server (its `app` permissions), ADR-0002 | Before the first real user | Not written yet |
 
 ## Template

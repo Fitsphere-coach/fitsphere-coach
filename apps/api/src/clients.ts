@@ -20,10 +20,10 @@ import type { OnboardingDeps } from './onboarding.ts';
 
 type Queryable = Pick<pg.Pool, 'query'>;
 
-const isHeadCoach = (account: Account) => account.roles.includes('head_coach');
+export const isHeadCoach = (account: Account) => account.roles.includes('head_coach');
 
 /** The coaches the viewer may see clients of: themselves, plus the gym's Coaches for the Head Coach. */
-const VISIBLE_UPPERS = `
+export const VISIBLE_UPPERS = `
   select $1::uuid as id
   union
   select l.lower_user_id from app.links l
@@ -102,7 +102,7 @@ async function gymCoaches(db: Queryable, viewer: Account): Promise<ClientListRes
 }
 
 /** One visible client's summary, or null when the viewer may not see them (answered as not found). */
-async function findClient(db: Queryable, viewer: Account, traineeId: string): Promise<Row | null> {
+export async function findClient(db: Queryable, viewer: Account, traineeId: string): Promise<Row | null> {
   const { rows } = await db.query<Row>(`${SELECT_CLIENTS} and l.lower_user_id = $3`, [viewer.id, isHeadCoach(viewer), traineeId]);
   return rows[0] ?? null;
 }

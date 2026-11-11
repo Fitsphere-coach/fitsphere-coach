@@ -72,3 +72,23 @@ trainee app is not affected (C-D22). Both apps send the same emails, with the sa
 5. Enter the code on the phone → "You're a Head Coach" → home. Try a wrong code (tries left), five wrong codes (locked), and a new request after a lock.
 6. Log in on another phone with the same account: it goes straight into the app (approved for good).
 7. Expiry is 7 days by default; to test it quickly, set `GYM_REQUEST_VALID_DAYS=1` for a test gym, or ask for the request's `expires_at` to be moved back in the test database. Never on Supabase without telling the owner.
+
+## 8. Trying CF06 (workout management) on your phone
+Needs migration **C0004** applied (after the pull request is merged and the owner says so; `npm run migrate`). Until Developer 1 builds TCR-003, **Publish is hidden** ("Publishing waits for the FitSphere app update") and you can try everything else.
+1. Start the API and the app as in §6. Sign in as a Head Coach or Coach who has at least one client.
+2. Home → **Workouts**. Templates tab: **New template** → name, goal, difficulty, "Whole gym" or "Only me", schedule (Weekdays or Rotating), weekly and daily target switches. Open a day → **Add exercise** (ten exercises) → open an exercise to set sets, reps, weight, RPE, rest, note; try Up, Down and **Superset**. Save.
+3. Open the template again: Copy, Assign plan, Deactivate (sheet), and "Show inactive templates". As a Coach, open a gym template made by another coach: it is read-only.
+4. **Assign plan** → pick clients and a start date → **Create drafts**. A client who already has a draft cannot be picked; one with an active plan shows a warning.
+5. Plans tab: the status chip (Draft, Active, Ended) is first. Open a plan: days, last change, **Edit plan**, **History**, **Discard draft**.
+6. After TCR-003: **Publish** (sheet) → the plan is Active; edit it → "changes that are not published" → Publish again; History → **Restore as draft**; **End plan**.
+7. A Coach must not see a plan of another Coach's client; the Head Coach sees all (with the coach filter).
+
+## 9. Trying CF07 (nutrition management) on your phone
+Needs migration **C0005** applied (after the pull request is merged and the owner says so; `npm run migrate` also applies any other pending file, such as C0003). Until Developer 1 builds TCR-004, **Publish is hidden** ("Publishing waits for the FitSphere app update") and you can try everything else.
+1. Start the API and the app as in §6. Sign in as a Head Coach or Coach who has at least one client.
+2. Home → **Nutrition**. Templates tab: **New template** → name, goal, "Whole gym" or "Only me", calorie and protein targets. Open **Breakfast** → **Add option** → **Add ingredient** → type two letters of a food ("pan"), pick it, choose grams or a serving → **Add**. The first high-protein food becomes the **protein source**; try changing it. Add a second option and a custom slot (**Add slot**, "logs as" Snack).
+3. Watch the day total against the targets: more than 10% off shows a warning, but you can still save. Save, then open the template again: Copy, Assign plan, Deactivate (sheet), "Show inactive templates". As a Coach, open a gym template made by another coach: it is read-only.
+4. **Assign plan** → pick clients and a start date → **Create drafts**. A client who has a draft cannot be picked; one with an active plan shows a warning.
+5. Plans tab: the status chip is first. Open a plan: the client's calorie and protein targets against option 1 of each slot, slots and ingredients, **Edit plan**, **History**, **Discard draft**.
+6. After TCR-004: **Publish** (sheet) → Active; edit → "changes that are not published" → Publish again; History → **Restore as draft**; **End plan**.
+7. A Coach must not see another Coach's client's plan; the Head Coach sees all.

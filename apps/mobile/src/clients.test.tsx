@@ -141,7 +141,9 @@ describe('Client profile', () => {
     expect(screen.getByText('140 g')).toBeTruthy();
     expect(screen.getByText('2 of 4')).toBeTruthy();
     expect(screen.getByText('Ravi Kumar')).toBeTruthy();
-    expect(screen.getAllByText('Not set yet')).toHaveLength(3);
+    expect(screen.getAllByText('Not set yet')).toHaveLength(1);
+    expect(screen.getByText('Open nutrition')).toBeTruthy();
+    expect(screen.getByText('Open workouts')).toBeTruthy();
   });
 
   it('shows "Not logged" and "Not set" for a client who has done nothing', async () => {

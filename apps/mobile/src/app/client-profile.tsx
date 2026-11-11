@@ -109,8 +109,8 @@ export default function ClientProfileScreen() {
 
           <Text style={[textStyles.label, styles.section, { color: colors.inkMuted }]}>PLANS AND SCHEDULE</Text>
           <Card>
-            <LinkRow icon="activity" title="Training plan" text="Not set yet" />
-            <LinkRow icon="coffee" title="Diet plan" text="Not set yet" />
+            <LinkRow icon="activity" title="Training plan" text="Open workouts" onPress={() => router.push('/workouts?tab=plans' as never)} />
+            <LinkRow icon="coffee" title="Diet plan" text="Open nutrition" onPress={() => router.push('/nutrition?tab=plans' as never)} />
             <LinkRow icon="calendar" title="Calendar" text="Not set yet" last />
           </Card>
 
@@ -203,16 +203,23 @@ function Row({ label, value, last }: { label: string; value: string; last?: bool
   );
 }
 
-function LinkRow({ icon, title, text, last }: { icon: IconName; title: string; text: string; last?: boolean }) {
+function LinkRow({ icon, title, text, last, onPress }: { icon: IconName; title: string; text: string; last?: boolean; onPress?: () => void }) {
   const { colors } = useTheme();
   return (
-    <View style={[styles.linkRow, last ? null : { borderBottomWidth: 1, borderBottomColor: colors.border }]}>
+    <Pressable
+      disabled={!onPress}
+      onPress={onPress}
+      accessibilityRole={onPress ? 'button' : 'text'}
+      accessibilityLabel={`${title}, ${text}`}
+      style={[styles.linkRow, last ? null : { borderBottomWidth: 1, borderBottomColor: colors.border }]}
+    >
       <Icon name={icon} color={colors.accent} />
       <View style={{ flex: 1 }}>
         <Text style={[textStyles.listTitle, { color: colors.ink }]}>{title}</Text>
         <Text style={[textStyles.small, { color: colors.inkMuted }]}>{text}</Text>
       </View>
-    </View>
+      {onPress ? <Icon name="chevron-right" color={colors.inkSubtle} /> : null}
+    </Pressable>
   );
 }
 

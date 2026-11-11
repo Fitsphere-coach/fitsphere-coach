@@ -42,6 +42,12 @@ const ERRORS: Record<RequestErrorCode, { status: number; message: string; retrya
     message: "Couldn't send your request. Try again.",
     retryable: true,
   },
+  PLAN_DRAFT_EXISTS: { status: 409, message: 'This client already has a draft plan.', retryable: false },
+  PLAN_NOT_READY: {
+    status: 409,
+    message: 'Add at least one training day, with an exercise on every training day, before publishing.',
+    retryable: false,
+  },
   INTERNAL_ERROR: { status: 500, message: 'Something went wrong.', retryable: true },
   SERVICE_UNAVAILABLE: {
     status: 503,

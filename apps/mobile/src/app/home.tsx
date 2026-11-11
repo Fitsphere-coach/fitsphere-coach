@@ -40,6 +40,8 @@ export default function Home() {
       </Text>
       <View style={{ marginTop: 24, gap: 12 }}>
         <SecondaryButton label="Clients" onPress={() => router.push('/clients')} />
+        <SecondaryButton label="Workouts" onPress={() => router.push('/workouts')} />
+        <SecondaryButton label="Nutrition" onPress={() => router.push('/nutrition')} />
         <Banner kind="info">Your dashboard arrives in a later feature. Open Account to change your password or log out.</Banner>
       </View>
     </View>
