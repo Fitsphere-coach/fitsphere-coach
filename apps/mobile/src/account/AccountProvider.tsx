@@ -1,4 +1,5 @@
 // The signed-in account as the app last read it (GET /v1/me), shared by the screens.
+import type { OnboardingStatus } from '@fitsphere-coach/shared';
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
 import { useAuth } from '../auth/AuthProvider';
 import { ensureAccount, type AccountState } from '../auth/service';
@@ -29,6 +30,8 @@ export function destinationFor(state: AccountState): string {
   switch (state.kind) {
     case 'coach':
       return '/home';
+    case 'onboarding':
+      return onboardingDestination(state.status.status);
     case 'coachingOff':
       return '/coaching-off';
     case 'emailNotVerified':
@@ -37,6 +40,22 @@ export function destinationFor(state: AccountState): string {
       return '/sign-in?expired=1';
     default:
       return '/';
+  }
+}
+
+/** Where each onboarding status goes (coach-scope §4.2a). The server decides the status. */
+function onboardingDestination(status: OnboardingStatus['status']): string {
+  switch (status) {
+    case 'pending':
+      return '/approval-code';
+    case 'expired':
+      return '/request-expired';
+    case 'locked':
+      return '/request-locked';
+    case 'approved':
+      return '/home';
+    default:
+      return '/gym-form';
   }
 }
 

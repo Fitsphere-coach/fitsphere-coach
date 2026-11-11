@@ -103,8 +103,9 @@ Adding and removing only works **downwards**: the person higher up decides.
 
 ### 4.2 Steps
 1. **Account:** name, email, password, "I am 18 or older", terms (the existing CF01 sign-up).
-2. **Gym form:** gym name, address, total number of trainees. More fields will be added later; the
-   form and its storage must allow new fields without rework.
+2. **Gym form:** gym name, address, city, pincode, owner phone, total number of trainees, and an
+   optional website or Instagram link (Q6). More fields will be added later; the form and its
+   storage allow new fields without rework (`extra_fields`).
 3. **Request approval:** the person taps "Send request". The system:
    - saves the request with status **Pending** and an expiry **7 days** from now;
    - creates a **6-digit approval code** (one-time password, OTP);
@@ -279,7 +280,7 @@ change. Every variable, its starting value and its allowed range are listed in `
 | Q3 | Does an existing FitSphere trainee who logs in follow a different route? | **Answered:** no. Every account without a coach role follows the same gym onboarding route (§4.1). |
 | Q4 | How the server emails the approval code | **Answered:** Gmail with an app password, from `appbayaipower@gmail.com` as "FitSphere Coach" (C-D16, ADR-0005). |
 | Q5 | Wrong-try and request limits | **Answered:** keep them outside the code (environment variables, ADR-0008) so they change without code (C-D17, §4.4). Starting values: 5 wrong tries, 3 requests a day. |
-| Q6 | Which extra gym fields come next (phone, city, GST number, …) | Open. The form stores extra fields without database changes. |
+| Q6 | Which extra gym fields come next (phone, city, GST number, …) | **Answered 2026-11-11 with the CF02 UI:** owner phone, city and pincode (required), and an optional website or Instagram link. GST number and others can come later; the form stores extra fields without database changes. |
 | Q7 | Trainees are no longer asked to "Allow" the Head Coach (C-D12). Should trainees be told, or asked, when trainees join? | Open. To be settled in TCR-001 (the trainee agrees to share their data with the gym). |
 | Q8 | Can the same trainee be added twice in one gym, and whose trainee are they when the Head Coach adds them? | **Answered 2026-11-04:** a trainee is added to a gym only once, by their Coach or the Head Coach; a second add shows "This trainee is already added." (C-D19). When the Head Coach adds a trainee, they choose "under myself" or "under a Coach" (C-D21). |
 | Q9 | When the Head Coach removes a Coach, what happens to that Coach's trainees? | **Answered 2026-11-04:** the Head Coach first moves them to another Coach or to themselves; removal is refused until the Coach has no trainees (C-D20). |

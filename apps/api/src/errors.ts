@@ -25,6 +25,18 @@ const ERRORS: Record<RequestErrorCode, { status: number; message: string; retrya
   NOT_FOUND: { status: 404, message: 'Not available.', retryable: false },
   PAYLOAD_TOO_LARGE: { status: 413, message: 'The request is too large.', retryable: false },
   RATE_LIMITED: { status: 429, message: 'Too many requests. Try again later.', retryable: true },
+  ALREADY_HEAD_COACH: { status: 409, message: 'This email is already registered as a Head Coach.', retryable: false },
+  ALREADY_COACH: { status: 409, message: 'This email is already registered as a Coach.', retryable: false },
+  REQUEST_LIMIT_REACHED: {
+    status: 429,
+    message: "You have sent the most requests allowed today. Try again tomorrow.",
+    retryable: false,
+  },
+  APPROVAL_EMAIL_FAILED: {
+    status: 503,
+    message: "Couldn't send your request. Try again.",
+    retryable: true,
+  },
   INTERNAL_ERROR: { status: 500, message: 'Something went wrong.', retryable: true },
   SERVICE_UNAVAILABLE: {
     status: 503,

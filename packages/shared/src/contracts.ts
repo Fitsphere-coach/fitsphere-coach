@@ -19,6 +19,10 @@ export const REQUEST_ERROR_CODES = [
   'NOT_FOUND',
   'PAYLOAD_TOO_LARGE',
   'RATE_LIMITED',
+  'ALREADY_HEAD_COACH',
+  'ALREADY_COACH',
+  'REQUEST_LIMIT_REACHED',
+  'APPROVAL_EMAIL_FAILED',
   'INTERNAL_ERROR',
   'SERVICE_UNAVAILABLE',
 ] as const;
@@ -102,6 +106,74 @@ export type MeResponse = z.infer<typeof meResponseSchema>;
 export function isCoachAccount(roles: readonly Role[]): boolean {
   return roles.some((role) => (COACH_ROLES as readonly Role[]).includes(role));
 }
+
+// --- Gym onboarding (CF02, coach-scope §4, ADR-0004) ---
+
+export const GYM_NAME_MAX = 100;
+export const GYM_ADDRESS_MAX = 200;
+export const GYM_CITY_MAX = 60;
+export const GYM_TRAINEES_MAX = 100_000;
+
+const trimmed = (min: number, max: number) =>
+  z
+    .string()
+    .transform((value) => value.trim().replace(/\s+/g, ' '))
+    .pipe(z.string().min(min).max(max));
+
+/** An Indian mobile or landline number: digits, with an optional +91 or 0 in front. */
+export const ownerPhoneSchema = z
+  .string()
+  .transform((value) => value.replace(/[\s-]/g, ''))
+  .pipe(z.string().regex(/^(\+91|0)?[0-9]{10}$/))
+  .transform((value) => `+91${value.slice(-10)}`);
+
+/** POST /v1/gym/onboarding/requests: the gym form. More fields arrive later (coach-scope Q6). */
+export const gymRequestSchema = z.strictObject({
+  gymName: trimmed(2, GYM_NAME_MAX),
+  address: trimmed(2, GYM_ADDRESS_MAX),
+  city: trimmed(2, GYM_CITY_MAX),
+  pincode: z.string().regex(/^[0-9]{6}$/),
+  ownerPhone: ownerPhoneSchema,
+  totalTrainees: z.number().int().min(1).max(GYM_TRAINEES_MAX),
+  /** Optional: a link FitSphere can use to check the gym. Kept in the open extra fields. */
+  websiteOrInstagram: trimmed(0, 200).optional(),
+});
+export type GymRequest = z.input<typeof gymRequestSchema>;
+/** The form after trimming and phone clean-up: what the server stores. */
+export type GymRequestParsed = z.output<typeof gymRequestSchema>;
+
+/** The approval code: digits only. The server also checks the length it is set to. */
+export const approvalCodeSchema = z.strictObject({ code: z.string().regex(/^[0-9]{4,8}$/) });
+
+/**
+ * Where a person without a Coach or Head Coach role is in gym onboarding (coach-scope §4.2a):
+ * `none` and `expired` and `locked` go to the gym form (or a message first), `pending` goes to
+ * "Enter your approval code", `approved` goes into the app.
+ */
+export const ONBOARDING_STATUSES = ['none', 'pending', 'expired', 'locked', 'approved'] as const;
+
+export const onboardingStatusSchema = z.object({
+  status: z.enum(ONBOARDING_STATUSES),
+  /** Of the pending request; null otherwise. */
+  expiresAt: instantSchema.nullable(),
+  /** Wrong codes left on the pending request; null otherwise. */
+  triesLeft: z.number().int().nullable(),
+  /** Gym requests the person may still send today (India date). */
+  requestsLeftToday: z.number().int(),
+  /** How many digits the approval code has (a server setting, 4 to 8). */
+  codeLength: z.number().int(),
+  gymName: z.string().nullable(),
+});
+export type OnboardingStatus = z.infer<typeof onboardingStatusSchema>;
+
+/** POST /v1/gym/onboarding/code: what happened to the code (wrong codes are answers, not errors). */
+export const CODE_RESULTS = ['approved', 'wrong', 'locked', 'expired', 'none'] as const;
+export const codeResultSchema = z.object({
+  result: z.enum(CODE_RESULTS),
+  triesLeft: z.number().int().nullable(),
+  gymName: z.string().nullable(),
+});
+export type CodeResult = z.infer<typeof codeResultSchema>;
 
 // --- Validation details from a Zod error (same rules as the trainee API) ---
 

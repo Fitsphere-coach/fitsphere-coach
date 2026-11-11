@@ -3,6 +3,7 @@ import {
   COACH_TERMS_VERSION,
   isCoachAccount,
   type MeResponse,
+  type OnboardingStatus,
 } from '@fitsphere-coach/shared';
 import { callApi } from '../api/client';
 
@@ -124,7 +125,12 @@ export async function signIn(deps: AuthDeps, email: string, password: string): P
 /** Where the app goes after log in (CF01-coach-auth-ui.md §2). */
 export type AccountState =
   | { kind: 'coach'; me: MeResponse }
-  /** Signed in with a FitSphere account that has not switched on coaching (CAUTH-001 AC4). */
+  /**
+   * An account with no Coach or Head Coach role goes to gym onboarding, whether or not it is also a
+   * FitSphere trainee (CF02, coach-scope §4.1). The server says where it is in the process.
+   */
+  | { kind: 'onboarding'; me: MeResponse; email: string | null; status: OnboardingStatus }
+  /** Signed in, but no account and no coach sign-up details to set one up (made in another app). */
   | { kind: 'coachingOff'; me: MeResponse | null; email: string | null }
   | { kind: 'emailNotVerified'; email: string | null }
   | { kind: 'signedOut' }
@@ -167,15 +173,20 @@ export async function ensureAccount(deps: AuthDeps): Promise<AccountState> {
       if (created.code === 'EMAIL_NOT_VERIFIED') return { kind: 'emailNotVerified', email };
       return { kind: 'unavailable' };
     }
-    return route(created.body, email);
+    return route(deps, session, created.body, email);
   }
-  if (me.kind === 'ok') return route(me.body, email);
+  if (me.kind === 'ok') return route(deps, session, me.body, email);
   // Signed in, but no account and no coach sign-up details (e.g. made in another app).
   return { kind: 'coachingOff', me: null, email };
 }
 
-function route(me: MeResponse, email: string | null): AccountState {
-  return isCoachAccount(me.roles) ? { kind: 'coach', me } : { kind: 'coachingOff', me, email };
+async function route(deps: AuthDeps, session: MinimalSession, me: MeResponse, email: string | null): Promise<AccountState> {
+  if (isCoachAccount(me.roles)) return { kind: 'coach', me };
+  // No coach role: the server decides where gym onboarding stands (coach-scope §4.2a).
+  const onboarding = await callApi<OnboardingStatus>(deps.apiUrl, '/gym/onboarding', options(deps, session));
+  if (onboarding.kind === 'offline') return { kind: 'offline' };
+  if (onboarding.kind === 'error') return { kind: 'unavailable' };
+  return { kind: 'onboarding', me, email, status: onboarding.body };
 }
 
 /** The coach sign-up details saved in the metadata, or null when this was not a coach sign-up. */
@@ -279,6 +290,6 @@ export async function signOutLocally(deps: AuthDeps): Promise<{ kind: 'signedOut
   return { kind: 'signedOut' };
 }
 
-function options(deps: AuthDeps, session: MinimalSession) {
+export function options(deps: AuthDeps, session: MinimalSession) {
   return { token: session.access_token, ...(deps.fetchImpl ? { fetchImpl: deps.fetchImpl } : {}) };
 }

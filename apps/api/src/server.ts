@@ -1,12 +1,23 @@
 import pg from 'pg';
 import { buildApp } from './app.ts';
 import { createSupabaseAuth } from './auth.ts';
+import { createGmailMailer } from './mailer.ts';
+import { loadSettings, SettingsError } from './settings.ts';
 
-// Settings from apps/api/.env (runbook, "Configuration names").
+// Settings from apps/api/.env (runbook, "Configuration names"). A missing or out-of-range value
+// stops the server and names the variable, never its value (ADR-0008, DC-5).
 const required = ['DATABASE_URL', 'SUPABASE_URL', 'SUPABASE_PUBLISHABLE_KEY'] as const;
 const missing = required.filter((name) => !process.env[name]);
 if (missing.length > 0) {
   console.error(`Missing in apps/api/.env: ${missing.join(', ')}`);
+  process.exit(1);
+}
+
+let settings;
+try {
+  settings = loadSettings(process.env);
+} catch (error) {
+  console.error(error instanceof SettingsError ? `${error.message}\nSee apps/api/.env.example.` : 'Settings could not be read.');
   process.exit(1);
 }
 
@@ -20,6 +31,10 @@ const app = buildApp({
     supabaseUrl: process.env.SUPABASE_URL!,
     publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY!,
   }),
+  onboarding: {
+    settings,
+    mailer: createGmailMailer({ user: settings.senderEmail, appPassword: settings.smtpAppPassword }),
+  },
   log: { level: process.env.LOG_LEVEL ?? 'info' },
 });
 

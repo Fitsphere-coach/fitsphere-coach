@@ -197,6 +197,64 @@ export function Field({ label, error, hint, password, labelAction, editable = tr
   );
 }
 
+/**
+ * The approval code boxes (design system "Code input"): boxes 64 high on `surfaceSunken`, 2 px
+ * border (active `accent`, error `danger`), digits in Barlow Condensed 34. One real input sits
+ * invisibly over them (one-time-code and paste support); the boxes only show what it holds.
+ */
+export function CodeInput({
+  value,
+  onChange,
+  length,
+  label,
+  error,
+  editable = true,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  length: number;
+  label: string;
+  error?: boolean;
+  editable?: boolean;
+}) {
+  const { colors } = useTheme();
+  return (
+    <View style={styles.codeWrap}>
+      <View style={styles.codeRow} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        {Array.from({ length }, (_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.codeBox,
+              {
+                backgroundColor: colors.surfaceSunken,
+                borderColor: error ? colors.danger : index === value.length ? colors.accent : colors.border,
+                opacity: editable ? 1 : 0.6,
+              },
+            ]}
+          >
+            <Text style={[styles.codeDigit, { color: colors.ink }]}>{value[index] ?? ''}</Text>
+          </View>
+        ))}
+      </View>
+      <TextInput
+        accessibilityLabel={label}
+        accessibilityValue={{ text: `${value.length} of ${length} digits entered` }}
+        value={value}
+        onChangeText={(text) => onChange(text.replace(/[^0-9]/g, '').slice(0, length))}
+        keyboardType="number-pad"
+        maxLength={length}
+        textContentType="oneTimeCode"
+        autoComplete="sms-otp"
+        autoCorrect={false}
+        editable={editable}
+        caretHidden
+        style={styles.codeHidden}
+      />
+    </View>
+  );
+}
+
 /** Three segments plus the live rule list (one segment per met rule). */
 export function PasswordStrength({ rules }: { rules: { label: string; met: boolean }[] }) {
   const { colors } = useTheme();
@@ -401,6 +459,11 @@ const styles = StyleSheet.create({
   eye: { position: 'absolute', right: 5, top: 5, width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   errorRow: { flexDirection: 'row', gap: 6, alignItems: 'flex-start' },
   small: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18 },
+  codeWrap: { height: 64 },
+  codeRow: { flexDirection: 'row', gap: 8, height: 64 },
+  codeBox: { flex: 1, height: 64, borderWidth: 2, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
+  codeDigit: { fontFamily: fonts.display, fontSize: 34, lineHeight: 40 },
+  codeHidden: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, opacity: 0.02, color: 'transparent' },
   segments: { flexDirection: 'row', gap: 4, marginTop: 2 },
   segment: { flex: 1, height: 4, borderRadius: radius.xs },
   rule: { flexDirection: 'row', gap: 8, alignItems: 'center' },
