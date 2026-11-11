@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { roleLabel, useAccount } from '../account/AccountProvider';
-import { Banner, Stripes, textStyles } from '../components/ui';
+import { Banner, SecondaryButton, Stripes, textStyles } from '../components/ui';
 import { Wordmark } from '../components/Wordmark';
 import { fonts, radius, useTheme } from '../theme';
 
@@ -38,7 +38,8 @@ export default function Home() {
         <Text style={{ color: colors.inkMuted }}>LET'S GO,{'\n'}</Text>
         {(name.split(' ')[0] || 'COACH').toUpperCase()}
       </Text>
-      <View style={{ marginTop: 24 }}>
+      <View style={{ marginTop: 24, gap: 12 }}>
+        <SecondaryButton label="Clients" onPress={() => router.push('/clients')} />
         <Banner kind="info">Your dashboard arrives in a later feature. Open Account to change your password or log out.</Banner>
       </View>
     </View>

@@ -6,6 +6,7 @@ import { registerAccess } from './access.ts';
 import type { Auth } from './auth.ts';
 import { errorBody, handleError } from './errors.ts';
 import type { OnboardingDeps } from './onboarding.ts';
+import { registerClientRoutes } from './routes/clients.ts';
 import { registerGymRoutes } from './routes/gym.ts';
 import { registerMeRoutes } from './routes/me.ts';
 
@@ -69,6 +70,7 @@ export function buildApp(deps: AppDeps) {
   }));
   registerMeRoutes(app, deps);
   registerGymRoutes(app, deps);
+  registerClientRoutes(app, deps);
 
   return app;
 }

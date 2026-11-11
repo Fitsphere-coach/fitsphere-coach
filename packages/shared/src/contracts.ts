@@ -19,6 +19,7 @@ export const REQUEST_ERROR_CODES = [
   'NOT_FOUND',
   'PAYLOAD_TOO_LARGE',
   'RATE_LIMITED',
+  'NOT_PERMITTED',
   'ALREADY_HEAD_COACH',
   'ALREADY_COACH',
   'REQUEST_LIMIT_REACHED',
@@ -174,6 +175,46 @@ export const codeResultSchema = z.object({
   gymName: z.string().nullable(),
 });
 export type CodeResult = z.infer<typeof codeResultSchema>;
+
+// --- Client management (CF04, SPEC-001 → coach-scope §3.4) ---
+// "Client" is the coach-app word for a trainee linked to a Coach or the Head Coach.
+
+export const clientSummarySchema = z.object({
+  /** The trainee's account id. */
+  id: idSchema,
+  /** The trainee's name when the FitSphere app holds one (TCR-001); until then, their email. */
+  name: z.string(),
+  coachId: idSchema,
+  /** The coach's name; null if that coach has not set a name. */
+  coachName: z.string().nullable(),
+  startedAt: instantSchema,
+  lastLoggedAt: instantSchema.nullable(),
+});
+export type ClientSummary = z.infer<typeof clientSummarySchema>;
+
+export const clientListResponseSchema = z.object({
+  clients: z.array(clientSummarySchema),
+  /** The gym's coaches the viewer may filter or move by: the Head Coach sees them, a Coach sees none. */
+  coaches: z.array(z.object({ id: idSchema, name: z.string().nullable() })),
+});
+export type ClientListResponse = z.infer<typeof clientListResponseSchema>;
+
+export const clientProfileSchema = clientSummarySchema.extend({
+  /** Latest weigh-in in kilograms (stored in grams); null with none. */
+  latestWeightKg: z.number().nullable(),
+  targets: z.object({
+    calories: z.number().int().nullable(),
+    proteinG: z.number().int().nullable(),
+    weeklyWorkouts: z.number().int().nullable(),
+  }),
+  /** Workouts logged this India week (Monday to Sunday). */
+  workoutsThisWeek: z.number().int(),
+});
+export type ClientProfile = z.infer<typeof clientProfileSchema>;
+
+/** POST /v1/clients/{id}/move: the Head Coach moves a client to a coach of the gym, or to themselves. */
+export const moveClientRequestSchema = z.strictObject({ coachId: idSchema });
+export type MoveClientRequest = z.infer<typeof moveClientRequestSchema>;
 
 // --- Validation details from a Zod error (same rules as the trainee API) ---
 
