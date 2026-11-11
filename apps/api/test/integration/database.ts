@@ -42,6 +42,16 @@ export async function createAppSchema(client: pg.ClientBase): Promise<void> {
   }
 }
 
+const PROPOSED_DIR = fileURLToPath(new URL('../fixtures/proposed-app/', import.meta.url));
+
+/** The app changes TCR-001 proposes, so inviting can be tested before they exist (test database only). */
+export async function createProposedAppTables(client: pg.ClientBase): Promise<void> {
+  const names = (await readdir(PROPOSED_DIR)).filter((name) => name.endsWith('.sql')).sort();
+  for (const name of names) {
+    await client.query(readFileSync(path.join(PROPOSED_DIR, name), 'utf8'));
+  }
+}
+
 /** A synthetic FitSphere account with the given roles, as the trainee API would create it. */
 export async function insertAccount(
   client: pg.ClientBase,

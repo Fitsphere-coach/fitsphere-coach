@@ -7,8 +7,8 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import { useAccount } from '../account/AccountProvider';
 import { useAuth } from '../auth/AuthProvider';
 import { TEXTS } from '../auth/texts';
-import { Banner, Field, Heading, IconTile, PushedLayout } from '../components/ui';
-import { loadClients } from '../clients/service';
+import { Banner, Field, Heading, IconTile, PrimaryButton, PushedLayout, TextLink } from '../components/ui';
+import { cancelInvitation, inviteClient, loadClients } from '../clients/service';
 import { CLIENT_TEXTS, coachLabel, lastLoggedText } from '../clients/texts';
 import { fonts, radius, useTheme } from '../theme';
 
@@ -44,7 +44,20 @@ export default function Clients() {
     return () => clearTimeout(timer);
   }, [load, search]);
 
+  // Resend is inviting the same email again; cancel ends the pending invitation.
+  async function resend(email: string, coachId: string) {
+    const outcome = await inviteClient(deps, email, coachId === myId ? undefined : coachId);
+    if (outcome === 'sent') void load();
+    else setProblem(outcome === 'offline' ? 'offline' : 'unavailable');
+  }
+  async function cancel(id: string) {
+    const outcome = await cancelInvitation(deps, id);
+    if (outcome === 'done' || outcome === 'notFound') void load();
+    else setProblem(outcome === 'offline' ? 'offline' : 'unavailable');
+  }
+
   const clients = list?.clients ?? [];
+  const invitations = list?.invitations ?? [];
   const coaches = list?.coaches ?? [];
 
   return (
@@ -80,7 +93,7 @@ export default function Clients() {
         ) : (
           <View style={{ marginTop: 40 }}>
             <IconTile name="users" />
-            <Heading first="No clients" second="yet" sub={CLIENT_TEXTS.emptySub} />
+            <Heading first="No clients" second="yet" sub={list.canInvite ? CLIENT_TEXTS.emptyInviteSub : CLIENT_TEXTS.emptySub} />
           </View>
         )
       ) : null}
@@ -106,6 +119,32 @@ export default function Clients() {
           </Pressable>
         ))}
       </View>
+
+      {invitations.length > 0 ? (
+        <View style={{ marginTop: 24, gap: 8 }}>
+          <Text style={[styles.section, { color: colors.inkMuted }]}>INVITED</Text>
+          {invitations.map((invitation) => (
+            <View key={invitation.id} style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <View style={{ flex: 1 }}>
+                <Text numberOfLines={1} style={[styles.name, { color: colors.ink }]}>{invitation.email}</Text>
+                <Text numberOfLines={1} style={[styles.sub, { color: colors.inkMuted }]}>
+                  Invited · {coachLabel(invitation.coachId, invitation.coachName, myId)}
+                </Text>
+              </View>
+              <View style={{ gap: 4, alignItems: 'flex-end' }}>
+                <TextLink label="Resend" onPress={() => void resend(invitation.email, invitation.coachId)} />
+                <TextLink label="Cancel" onPress={() => void cancel(invitation.id)} />
+              </View>
+            </View>
+          ))}
+        </View>
+      ) : null}
+
+      {list?.canInvite ? (
+        <View style={{ marginTop: 24 }}>
+          <PrimaryButton label="Invite client" arrow onPress={() => router.push('/client-invite')} />
+        </View>
+      ) : null}
     </PushedLayout>
   );
 }
@@ -129,6 +168,7 @@ const styles = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { minHeight: 44, paddingHorizontal: 12, borderWidth: 1.5, borderRadius: radius.sm, justifyContent: 'center' },
   chipText: { fontFamily: fonts.displayBold, fontSize: 14, letterSpacing: 1 },
+  section: { fontFamily: fonts.displayBold, fontSize: 13, letterSpacing: 1.5 },
   empty: { marginTop: 32, fontFamily: fonts.body, fontSize: 15, textAlign: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: radius.sm, paddingVertical: 12, paddingHorizontal: 14, minHeight: 68 },
   avatar: { width: 44, height: 44, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },

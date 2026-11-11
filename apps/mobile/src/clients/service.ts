@@ -42,3 +42,40 @@ export async function removeClient(deps: AuthDeps, id: string): Promise<ChangeRe
   const result = await authed(deps, `/clients/${encodeURIComponent(id)}/remove`, { method: 'POST', body: {} });
   return result.kind === 'ok' ? 'done' : result.kind;
 }
+
+export type InviteResult = 'sent' | 'alreadyAdded' | 'cannotInvite' | 'limit' | 'emailFailed' | 'invalid' | 'refused' | 'offline' | 'unavailable' | 'signedOut';
+
+/** Invites a trainee by email. The server decides everything; the same answer whether or not the email has an account. */
+export async function inviteClient(deps: AuthDeps, email: string, coachId?: string): Promise<InviteResult> {
+  const session = (await deps.client.getSession()).data.session;
+  if (!session) return 'signedOut';
+  const response = await callApi(deps.apiUrl, '/clients/invitations', {
+    ...options(deps, session),
+    method: 'POST',
+    body: { email, ...(coachId ? { coachId } : {}) },
+  });
+  if (response.kind === 'ok') return 'sent';
+  if (response.kind === 'offline') return 'offline';
+  switch (response.code) {
+    case 'ALREADY_ADDED':
+      return 'alreadyAdded';
+    case 'CANNOT_INVITE_EMAIL':
+      return 'cannotInvite';
+    case 'INVITE_LIMIT_REACHED':
+      return 'limit';
+    case 'INVITE_EMAIL_FAILED':
+      return 'emailFailed';
+    case 'VALIDATION_FAILED':
+      return 'invalid';
+    case 'NOT_PERMITTED':
+    case 'NOT_FOUND':
+      return 'refused';
+    default:
+      return 'unavailable';
+  }
+}
+
+export async function cancelInvitation(deps: AuthDeps, id: string): Promise<ChangeResult> {
+  const result = await authed(deps, `/clients/invitations/${encodeURIComponent(id)}/cancel`, { method: 'POST', body: {} });
+  return result.kind === 'ok' ? 'done' : result.kind;
+}

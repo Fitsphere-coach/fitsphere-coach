@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **App** | FitSphere Coach (Expo, iOS + Android) |
-| **Status** | **UI approved by the owner, 2026-11-11.** Screens are in the "FitSphere Coach Screens" canvas (rows "SPEC-001 · Client management", dark and light). **Built:** client list (2.1, 2.2), profile (2.5), change coach (2.6), remove client (2.7). **Waiting for Developer 1 (TCR-001):** invite a client (2.3, 2.4), the trainee's real name, and the Inactive and Invited filters. Until then the list shows each client's email. |
+| **Status** | **UI approved by the owner, 2026-11-11.** Screens are in the "FitSphere Coach Screens" canvas (rows "SPEC-001 · Client management", dark and light). **Built:** client list (2.1, 2.2), invite a client (2.3, 2.4), profile (2.5), change coach (2.6), remove client (2.7), and the Invited list with Resend and Cancel. **Invite is built but switched off** (`TRAINEE_INVITES_ENABLED=false`) until Developer 1 delivers TCR-001; the server then answers "not found" and the app hides the button. **Still waiting for TCR-001:** the trainee's real name (the list shows the email, and shows the name automatically once `app.users.full_name` exists) and the Inactive filter (former-client history, C-D28). |
 | **Source spec** | `spec/SPEC-001-client-management.md` (business draft). Where it disagrees with `docs/product/coach-scope.md` v0.4 or a C-D decision, the scope and the decisions win (CLAUDE.md). |
 | **Depends on** | CF02 (the Head Coach exists), CF03 (Coaches exist), **TCR-001** (trainee accepts a gym invitation; Developer 1, C-D22) |
 | **Scope/decisions** | coach-scope §3.4, §6; C-D12, C-D15, C-D18, C-D19, C-D20, C-D21, C-D23, C-D24, C-D26, C-D28 |

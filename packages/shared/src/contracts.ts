@@ -20,6 +20,10 @@ export const REQUEST_ERROR_CODES = [
   'PAYLOAD_TOO_LARGE',
   'RATE_LIMITED',
   'NOT_PERMITTED',
+  'ALREADY_ADDED',
+  'CANNOT_INVITE_EMAIL',
+  'INVITE_LIMIT_REACHED',
+  'INVITE_EMAIL_FAILED',
   'ALREADY_HEAD_COACH',
   'ALREADY_COACH',
   'REQUEST_LIMIT_REACHED',
@@ -192,10 +196,24 @@ export const clientSummarySchema = z.object({
 });
 export type ClientSummary = z.infer<typeof clientSummarySchema>;
 
+export const invitationSummarySchema = z.object({
+  id: idSchema,
+  email: z.string(),
+  /** Who the client will be under (the Head Coach or a Coach of the gym). */
+  coachId: idSchema,
+  coachName: z.string().nullable(),
+  expiresAt: instantSchema,
+});
+export type InvitationSummary = z.infer<typeof invitationSummarySchema>;
+
 export const clientListResponseSchema = z.object({
   clients: z.array(clientSummarySchema),
   /** The gym's coaches the viewer may filter or move by: the Head Coach sees them, a Coach sees none. */
   coaches: z.array(z.object({ id: idSchema, name: z.string().nullable() })),
+  /** Whether inviting is switched on (it waits for the trainee app, TCR-001, C-D22). */
+  canInvite: z.boolean(),
+  /** Invitations sent and not yet answered; empty while inviting is off. */
+  invitations: z.array(invitationSummarySchema),
 });
 export type ClientListResponse = z.infer<typeof clientListResponseSchema>;
 
@@ -211,6 +229,16 @@ export const clientProfileSchema = clientSummarySchema.extend({
   workoutsThisWeek: z.number().int(),
 });
 export type ClientProfile = z.infer<typeof clientProfileSchema>;
+
+/** POST /v1/clients/invitations: invite a trainee by email. A Coach always adds under themselves; the Head Coach may name a Coach (C-D21). */
+export const inviteClientRequestSchema = z.strictObject({
+  email: z
+    .string()
+    .transform((value) => value.trim().toLowerCase())
+    .pipe(z.string().max(254).regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)),
+  coachId: idSchema.optional(),
+});
+export type InviteClientRequest = z.input<typeof inviteClientRequestSchema>;
 
 /** POST /v1/clients/{id}/move: the Head Coach moves a client to a coach of the gym, or to themselves. */
 export const moveClientRequestSchema = z.strictObject({ coachId: idSchema });

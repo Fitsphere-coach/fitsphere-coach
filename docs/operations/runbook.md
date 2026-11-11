@@ -21,6 +21,8 @@
 | `APPROVAL_CODE_LENGTH`, `GYM_REQUEST_VALID_DAYS`, `APPROVAL_WRONG_TRIES`, `GYM_REQUESTS_PER_DAY` | `apps/api/.env` | Code digits (4–8), days a request is valid (1–30), wrong tries (1–10), requests per person per day (1–10). The server refuses to start with a missing or out-of-range value and names it. | No |
 | `APPROVAL_CODE_SECRET` | `apps/api/.env` | The key that scrambles approval codes before they are stored (ADR-0004): 32+ random characters, e.g. `node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`. Changing it makes open requests' codes stop working. | **Yes** |
 | `SMTP_APP_PASSWORD` | `apps/api/.env` | The Google app password of `SENDER_EMAIL` (ADR-0005 "Owner set-up": 2-Step Verification, then App passwords). | **Yes** |
+| `TRAINEE_INVITE_VALID_DAYS`, `INVITES_PER_DAY` | `apps/api/.env` | Days a trainee invitation stays valid (1–30, the same number as the trainee app, TCR-001) and invitations one person may send a day (1–100). | No |
+| `TRAINEE_INVITES_ENABLED` | `apps/api/.env` | `true` or `false`. Keep **false** until Developer 1 has built TCR-001 and its tables exist in the shared database; while false the invite routes answer "not found" and the app hides Invite client (C-D22). | No |
 | `TEST_DATABASE_URL` | `apps/api/.env` or CI | Local test database, e.g. `postgres://postgres:postgres@localhost:5432/fitsphere_coach_test`. **Never Supabase**: the tests drop and recreate schemas `app` and `coach` | No |
 | `EXPO_PUBLIC_SUPABASE_URL` | `apps/mobile/.env` | Same as `SUPABASE_URL` | No |
 | `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `apps/mobile/.env` | Same as `SUPABASE_PUBLISHABLE_KEY` | No |

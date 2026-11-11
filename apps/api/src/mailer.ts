@@ -30,6 +30,41 @@ export function createGmailMailer(options: { user: string; appPassword: string }
   };
 }
 
+export type InviteEmailData = {
+  inviteeEmail: string;
+  gymName: string;
+  coachName: string;
+  /** The one-time token for the link; only its hash is stored (TCR-001). */
+  token: string;
+  expiresAt: Date;
+};
+
+/**
+ * The invitation to a trainee who has no FitSphere account yet (C-D23): they create their own
+ * account with this email and accept in the FitSphere app. The link's scheme is a TCR-001 open
+ * question; until Developer 1 settles it the token is shown for the claim step.
+ */
+export function inviteEmail(settings: Settings, data: InviteEmailData): OutgoingEmail {
+  const lines = [
+    `${data.coachName} at ${data.gymName} invited you to FitSphere.`,
+    ``,
+    `Open the FitSphere app and create your account with this email address (${data.inviteeEmail}) to accept.`,
+    `You choose whether to accept. Nothing is shared with the gym until you do.`,
+    ``,
+    `Invitation code: ${data.token}`,
+    `This invitation works until ${indiaTime(data.expiresAt)}.`,
+    ``,
+    `If you were not expecting this, ignore this email.`,
+  ];
+  return {
+    to: data.inviteeEmail,
+    fromName: settings.senderDisplayName,
+    fromAddress: settings.senderEmail,
+    subject: `${data.gymName} invited you to FitSphere`,
+    text: lines.join('\n'),
+  };
+}
+
 export type ApprovalEmailData = {
   code: string;
   gymName: string;

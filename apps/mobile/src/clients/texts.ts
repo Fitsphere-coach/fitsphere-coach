@@ -28,6 +28,15 @@ export function coachLabel(coachId: string, coachName: string | null, myId: stri
 
 export const CLIENT_TEXTS = {
   empty: 'No clients yet',
+  emptyInviteSub: 'Invite a trainee by email. When they accept in the FitSphere app, they appear here and you can see what they log.',
+  inviteSub: 'Enter their email. They accept in the FitSphere app, and you see their data once they do.',
+  inviteInfo: 'The invite works for 7 days. You can cancel it any time.',
+  alreadyAdded: 'This trainee is already added.',
+  cannotInvite: 'This email can’t be invited here.',
+  inviteLimit: 'You have sent the most invites allowed today. Try again tomorrow.',
+  inviteEmailFailed: 'Couldn’t send the invite. Check your connection and try again.',
+  inviteInvalid: 'Enter an email address like name@example.com.',
+  inviteSent: (email: string) => `We emailed ${email} if they have no FitSphere account yet; otherwise they will see the invite when they open the FitSphere app. When they accept, they appear in your clients. The invite expires in 7 days.`,
   emptySub: 'When a trainee joins your gym, they appear here and you can see what they log. Inviting clients arrives in the next update.',
   noMatch: 'No clients match.',
   removeBody: (name: string) =>

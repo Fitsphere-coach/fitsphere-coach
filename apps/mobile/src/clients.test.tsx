@@ -36,7 +36,7 @@ const client = (id: string, name: string, coachId = RAVI, coachName: string | nu
   startedAt: '2026-11-03T08:00:00.000Z',
   lastLoggedAt: new Date().toISOString(),
 });
-const list = (clients: object[], coaches: object[] = []) => ({ status: 200, body: { clients, coaches } });
+const list = (clients: object[], coaches: object[] = [], extra: object = {}) => ({ status: 200, body: { clients, coaches, canInvite: false, invitations: [], ...extra } });
 const profile = (extra: object = {}) => ({
   status: 200,
   body: {

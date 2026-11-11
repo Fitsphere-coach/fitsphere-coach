@@ -13,6 +13,9 @@ const valid = {
   GYM_REQUEST_VALID_DAYS: '7',
   APPROVAL_WRONG_TRIES: '5',
   GYM_REQUESTS_PER_DAY: '3',
+  TRAINEE_INVITE_VALID_DAYS: '7',
+  INVITES_PER_DAY: '20',
+  TRAINEE_INVITES_ENABLED: 'false',
   APPROVAL_CODE_SECRET: 'x'.repeat(32),
   SMTP_APP_PASSWORD: 'app-password',
 };
@@ -46,6 +49,10 @@ describe('loadSettings', () => {
     expect(settings.gymRequestValidDays).toBe(7);
     expect(settings.approvalWrongTries).toBe(5);
     expect(settings.gymRequestsPerDay).toBe(3);
+    expect(settings.traineeInviteValidDays).toBe(7);
+    expect(settings.invitesPerDay).toBe(20);
+    // Off until Developer 1 delivers TCR-001.
+    expect(settings.traineeInvitesEnabled).toBe(false);
   });
 
   it.each(Object.keys(valid))('refuses to start without %s, and names it', (name) => {
@@ -65,6 +72,11 @@ describe('loadSettings', () => {
     ['GYM_REQUESTS_PER_DAY', '0'],
     ['GYM_REQUESTS_PER_DAY', '11'],
     ['GYM_REQUESTS_PER_DAY', '2.5'],
+    ['TRAINEE_INVITE_VALID_DAYS', '0'],
+    ['TRAINEE_INVITE_VALID_DAYS', '31'],
+    ['INVITES_PER_DAY', '0'],
+    ['INVITES_PER_DAY', '101'],
+    ['TRAINEE_INVITES_ENABLED', 'maybe'],
     ['APPROVAL_INBOX', 'not-an-email'],
     ['SENDER_EMAIL', 'also not'],
     ['SENDER_DISPLAY_NAME', 'x'.repeat(51)],

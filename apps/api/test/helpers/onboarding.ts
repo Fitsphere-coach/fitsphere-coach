@@ -12,6 +12,9 @@ export const TEST_SETTINGS: Settings = {
   gymRequestValidDays: 7,
   approvalWrongTries: 5,
   gymRequestsPerDay: 3,
+  traineeInviteValidDays: 7,
+  invitesPerDay: 20,
+  traineeInvitesEnabled: true,
   approvalCodeSecret: 'test-secret-test-secret-test-secret-1234',
   smtpAppPassword: 'test-app-password',
 };

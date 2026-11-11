@@ -15,6 +15,8 @@ import type { ClientListResponse, ClientProfile, ClientSummary } from '@fitspher
 import type pg from 'pg';
 import type { Account } from './accounts.ts';
 import { ApiError } from './errors.ts';
+import { invitesEnabled, listInvitations } from './invitations.ts';
+import type { OnboardingDeps } from './onboarding.ts';
 
 type Queryable = Pick<pg.Pool, 'query'>;
 
@@ -36,7 +38,7 @@ const LAST_LOGGED = `
 
 type Row = {
   trainee_id: string;
-  email: string;
+  name: string;
   coach_id: string;
   coach_name: string | null;
   started_at: Date;
@@ -45,8 +47,7 @@ type Row = {
 
 const toSummary = (row: Row): ClientSummary => ({
   id: row.trainee_id,
-  // The trainee's name arrives with TCR-001 (app.users.full_name); until then, their email.
-  name: row.email,
+  name: row.name,
   coachId: row.coach_id,
   coachName: row.coach_name,
   startedAt: row.started_at.toISOString(),
@@ -54,7 +55,11 @@ const toSummary = (row: Row): ClientSummary => ({
 });
 
 const SELECT_CLIENTS = `
-  select l.lower_user_id as trainee_id, u.email, l.upper_user_id as coach_id, p.full_name as coach_name,
+  select l.lower_user_id as trainee_id,
+         -- The trainee's name once TCR-001 adds app.users.full_name; their email until then. to_jsonb
+         -- reads the column only if it exists, so this runs before and after that change.
+         coalesce(nullif(to_jsonb(u) ->> 'full_name', ''), u.email) as name,
+         l.upper_user_id as coach_id, p.full_name as coach_name,
          l.started_at, ${LAST_LOGGED} as last_logged_at
   from app.links l
   join app.users u on u.id = l.lower_user_id
@@ -66,16 +71,22 @@ export async function listClients(
   db: Queryable,
   viewer: Account,
   filter: { q?: string | undefined; coachId?: string | undefined },
+  deps: OnboardingDeps,
 ): Promise<ClientListResponse> {
   const head = isHeadCoach(viewer);
   const { rows } = await db.query<Row>(
     `${SELECT_CLIENTS}
-       and ($3::text is null or u.email ilike '%' || $3 || '%')
+       and ($3::text is null or u.email ilike '%' || $3 || '%' or to_jsonb(u) ->> 'full_name' ilike '%' || $3 || '%')
        and ($4::uuid is null or l.upper_user_id = $4)
      order by lower(u.email)`,
     [viewer.id, head, filter.q?.trim() || null, filter.coachId ?? null],
   );
-  return { clients: rows.map(toSummary), coaches: head ? await gymCoaches(db, viewer) : [] };
+  return {
+    clients: rows.map(toSummary),
+    coaches: head ? await gymCoaches(db, viewer) : [],
+    canInvite: invitesEnabled(deps),
+    invitations: await listInvitations(db, viewer, deps),
+  };
 }
 
 /** The Head Coach's gym Coaches with their names. Empty for anyone else. */
