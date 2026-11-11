@@ -5,6 +5,7 @@ import pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { buildApp } from '../../src/app.ts';
 import { createTestAuth, signToken, type fakeSupabaseUsers, type TestKeys } from '../helpers/auth.ts';
+import { testOnboarding } from '../helpers/onboarding.ts';
 import { connect, insertAccount, testDatabaseUrl } from './database.ts';
 
 let client: pg.Client;
@@ -19,7 +20,7 @@ beforeAll(async () => {
   const testAuth = await createTestAuth();
   keys = testAuth.keys;
   supabase = testAuth.supabase;
-  app = buildApp({ db, auth: testAuth.auth });
+  app = buildApp({ db, auth: testAuth.auth, onboarding: testOnboarding().deps });
   await app.ready();
 });
 afterAll(async () => {

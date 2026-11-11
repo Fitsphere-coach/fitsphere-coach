@@ -27,11 +27,11 @@ running and fixing happen here.
   onboarded and approved by FitSphere with a 6-digit code emailed to `appbayaipower@gmail.com`;
   Coaches join only by a Head Coach's invitation; Head Coach powers; change log on plans;
   only the person higher up adds or removes (C-D18, 2026-11-04).
-- **Next feature: CF02 — gym onboarding and FitSphere approval code.** The owner answered
+- **CF02 — gym onboarding and FitSphere approval code — built 2026-11-11 (UI locked in `docs/design/CF02-gym-onboarding-ui.md`); phone check and migration C0003 pending.** The owner answered
   coach-scope §11 Q1–Q5. Every account without a coach role, trainee or not, goes to gym onboarding;
   log in never reveals whether an email exists; limits and email settings live in environment variables (C-D17, ADR-0008). C-D16 is
-  accepted (ADR-0005: Gmail with an app password). Design CF02's screens and wait for "UI approved"
-  before building.
+  accepted (ADR-0005: Gmail with an app password). Next: the owner's phone check (runbook §7), after
+  the pull request is merged and C0003 is applied. The next feature is CF03.
 - **Trainee-app changes (C-D22, 2026-11-04):** the trainee side of CF03 (a trainee accepting an
   invite), CF04 and coach-set targets and plans (CF05–CF07) need the trainee app to change. Build
   the coach side here, and write the trainee side as a change request for Developer 1

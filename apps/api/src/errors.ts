@@ -25,6 +25,23 @@ const ERRORS: Record<RequestErrorCode, { status: number; message: string; retrya
   NOT_FOUND: { status: 404, message: 'Not available.', retryable: false },
   PAYLOAD_TOO_LARGE: { status: 413, message: 'The request is too large.', retryable: false },
   RATE_LIMITED: { status: 429, message: 'Too many requests. Try again later.', retryable: true },
+  NOT_PERMITTED: { status: 403, message: "You can't do this.", retryable: false },
+  ALREADY_ADDED: { status: 409, message: "This trainee is already added.", retryable: false },
+  CANNOT_INVITE_EMAIL: { status: 409, message: "This email can’t be invited here.", retryable: false },
+  INVITE_LIMIT_REACHED: { status: 429, message: "You have sent the most invites allowed today. Try again tomorrow.", retryable: false },
+  INVITE_EMAIL_FAILED: { status: 503, message: "Couldn’t send the invite. Try again.", retryable: true },
+  ALREADY_HEAD_COACH: { status: 409, message: 'This email is already registered as a Head Coach.', retryable: false },
+  ALREADY_COACH: { status: 409, message: 'This email is already registered as a Coach.', retryable: false },
+  REQUEST_LIMIT_REACHED: {
+    status: 429,
+    message: "You have sent the most requests allowed today. Try again tomorrow.",
+    retryable: false,
+  },
+  APPROVAL_EMAIL_FAILED: {
+    status: 503,
+    message: "Couldn't send your request. Try again.",
+    retryable: true,
+  },
   INTERNAL_ERROR: { status: 500, message: 'Something went wrong.', retryable: true },
   SERVICE_UNAVAILABLE: {
     status: 503,

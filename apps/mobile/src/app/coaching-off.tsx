@@ -1,12 +1,13 @@
-// Coaching is off (CAUTH-001 AC4, CAUTH-005): a FitSphere account that has not switched on Coach
-// or Head Coach. Switching on is CF02; invites shown here arrive with CF03 (D-11: in the app).
+// Coaching is off: the rare account that is signed in but was never set up for the coach app (no
+// coach account and no coach sign-up details). Every set-up account without a coach role goes to
+// gym onboarding instead (CF02, coach-scope §4.1). Invites shown here arrive with CF03.
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useAccount } from '../account/AccountProvider';
 import { useAuth } from '../auth/AuthProvider';
 import { logOut } from '../auth/service';
-import { AuthLayout, Heading, Icon, IconTile, PrimaryButton, SecondaryButton, Strong, textStyles, type IconName } from '../components/ui';
+import { AuthLayout, Heading, Icon, IconTile, SecondaryButton, Strong, textStyles, type IconName } from '../components/ui';
 import { radius, useTheme } from '../theme';
 
 export default function CoachingOff() {
@@ -24,12 +25,7 @@ export default function CoachingOff() {
 
   return (
     <AuthLayout
-      footer={
-        <>
-          <PrimaryButton label="Switch on coaching" arrow onPress={() => router.push('/choose-role')} disabled={leaving} />
-          <SecondaryButton label="Log out" onPress={() => void leave()} disabled={leaving} />
-        </>
-      }
+      footer={<SecondaryButton label="Log out" onPress={() => void leave()} disabled={leaving} />}
     >
       <View style={{ marginTop: 40 }}>
         <IconTile name="users" />
@@ -39,17 +35,17 @@ export default function CoachingOff() {
         second="off"
         sub={
           <>
-            You're logged in as <Strong>{shownEmail}</Strong>. This account uses the FitSphere app. Switch on coaching to use
-            FitSphere Coach with the same login.
+            You're logged in as <Strong>{shownEmail}</Strong>. This account was made in the FitSphere app and has not been
+            set up for FitSphere Coach yet.
           </>
         }
       />
       <InfoCard
         rows={[
           {
-            icon: 'award',
-            title: 'Coach or lead a team',
-            text: 'Switch on Coach to coach trainees, or Head Coach to lead coaches. Your own logs stay private.',
+            icon: 'refresh-cw',
+            title: 'Set-up not finished',
+            text: 'Log out and log in again to register your gym. If this screen comes back, contact FitSphere.',
           },
           {
             icon: 'mail',

@@ -19,6 +19,15 @@ export const REQUEST_ERROR_CODES = [
   'NOT_FOUND',
   'PAYLOAD_TOO_LARGE',
   'RATE_LIMITED',
+  'NOT_PERMITTED',
+  'ALREADY_ADDED',
+  'CANNOT_INVITE_EMAIL',
+  'INVITE_LIMIT_REACHED',
+  'INVITE_EMAIL_FAILED',
+  'ALREADY_HEAD_COACH',
+  'ALREADY_COACH',
+  'REQUEST_LIMIT_REACHED',
+  'APPROVAL_EMAIL_FAILED',
   'INTERNAL_ERROR',
   'SERVICE_UNAVAILABLE',
 ] as const;
@@ -102,6 +111,138 @@ export type MeResponse = z.infer<typeof meResponseSchema>;
 export function isCoachAccount(roles: readonly Role[]): boolean {
   return roles.some((role) => (COACH_ROLES as readonly Role[]).includes(role));
 }
+
+// --- Gym onboarding (CF02, coach-scope §4, ADR-0004) ---
+
+export const GYM_NAME_MAX = 100;
+export const GYM_ADDRESS_MAX = 200;
+export const GYM_CITY_MAX = 60;
+export const GYM_TRAINEES_MAX = 100_000;
+
+const trimmed = (min: number, max: number) =>
+  z
+    .string()
+    .transform((value) => value.trim().replace(/\s+/g, ' '))
+    .pipe(z.string().min(min).max(max));
+
+/** An Indian mobile or landline number: digits, with an optional +91 or 0 in front. */
+export const ownerPhoneSchema = z
+  .string()
+  .transform((value) => value.replace(/[\s-]/g, ''))
+  .pipe(z.string().regex(/^(\+91|0)?[0-9]{10}$/))
+  .transform((value) => `+91${value.slice(-10)}`);
+
+/** POST /v1/gym/onboarding/requests: the gym form. More fields arrive later (coach-scope Q6). */
+export const gymRequestSchema = z.strictObject({
+  gymName: trimmed(2, GYM_NAME_MAX),
+  address: trimmed(2, GYM_ADDRESS_MAX),
+  city: trimmed(2, GYM_CITY_MAX),
+  pincode: z.string().regex(/^[0-9]{6}$/),
+  ownerPhone: ownerPhoneSchema,
+  totalTrainees: z.number().int().min(1).max(GYM_TRAINEES_MAX),
+  /** Optional: a link FitSphere can use to check the gym. Kept in the open extra fields. */
+  websiteOrInstagram: trimmed(0, 200).optional(),
+});
+export type GymRequest = z.input<typeof gymRequestSchema>;
+/** The form after trimming and phone clean-up: what the server stores. */
+export type GymRequestParsed = z.output<typeof gymRequestSchema>;
+
+/** The approval code: digits only. The server also checks the length it is set to. */
+export const approvalCodeSchema = z.strictObject({ code: z.string().regex(/^[0-9]{4,8}$/) });
+
+/**
+ * Where a person without a Coach or Head Coach role is in gym onboarding (coach-scope §4.2a):
+ * `none` and `expired` and `locked` go to the gym form (or a message first), `pending` goes to
+ * "Enter your approval code", `approved` goes into the app.
+ */
+export const ONBOARDING_STATUSES = ['none', 'pending', 'expired', 'locked', 'approved'] as const;
+
+export const onboardingStatusSchema = z.object({
+  status: z.enum(ONBOARDING_STATUSES),
+  /** Of the pending request; null otherwise. */
+  expiresAt: instantSchema.nullable(),
+  /** Wrong codes left on the pending request; null otherwise. */
+  triesLeft: z.number().int().nullable(),
+  /** Gym requests the person may still send today (India date). */
+  requestsLeftToday: z.number().int(),
+  /** How many digits the approval code has (a server setting, 4 to 8). */
+  codeLength: z.number().int(),
+  gymName: z.string().nullable(),
+});
+export type OnboardingStatus = z.infer<typeof onboardingStatusSchema>;
+
+/** POST /v1/gym/onboarding/code: what happened to the code (wrong codes are answers, not errors). */
+export const CODE_RESULTS = ['approved', 'wrong', 'locked', 'expired', 'none'] as const;
+export const codeResultSchema = z.object({
+  result: z.enum(CODE_RESULTS),
+  triesLeft: z.number().int().nullable(),
+  gymName: z.string().nullable(),
+});
+export type CodeResult = z.infer<typeof codeResultSchema>;
+
+// --- Client management (CF04, SPEC-001 → coach-scope §3.4) ---
+// "Client" is the coach-app word for a trainee linked to a Coach or the Head Coach.
+
+export const clientSummarySchema = z.object({
+  /** The trainee's account id. */
+  id: idSchema,
+  /** The trainee's name when the FitSphere app holds one (TCR-001); until then, their email. */
+  name: z.string(),
+  coachId: idSchema,
+  /** The coach's name; null if that coach has not set a name. */
+  coachName: z.string().nullable(),
+  startedAt: instantSchema,
+  lastLoggedAt: instantSchema.nullable(),
+});
+export type ClientSummary = z.infer<typeof clientSummarySchema>;
+
+export const invitationSummarySchema = z.object({
+  id: idSchema,
+  email: z.string(),
+  /** Who the client will be under (the Head Coach or a Coach of the gym). */
+  coachId: idSchema,
+  coachName: z.string().nullable(),
+  expiresAt: instantSchema,
+});
+export type InvitationSummary = z.infer<typeof invitationSummarySchema>;
+
+export const clientListResponseSchema = z.object({
+  clients: z.array(clientSummarySchema),
+  /** The gym's coaches the viewer may filter or move by: the Head Coach sees them, a Coach sees none. */
+  coaches: z.array(z.object({ id: idSchema, name: z.string().nullable() })),
+  /** Whether inviting is switched on (it waits for the trainee app, TCR-001, C-D22). */
+  canInvite: z.boolean(),
+  /** Invitations sent and not yet answered; empty while inviting is off. */
+  invitations: z.array(invitationSummarySchema),
+});
+export type ClientListResponse = z.infer<typeof clientListResponseSchema>;
+
+export const clientProfileSchema = clientSummarySchema.extend({
+  /** Latest weigh-in in kilograms (stored in grams); null with none. */
+  latestWeightKg: z.number().nullable(),
+  targets: z.object({
+    calories: z.number().int().nullable(),
+    proteinG: z.number().int().nullable(),
+    weeklyWorkouts: z.number().int().nullable(),
+  }),
+  /** Workouts logged this India week (Monday to Sunday). */
+  workoutsThisWeek: z.number().int(),
+});
+export type ClientProfile = z.infer<typeof clientProfileSchema>;
+
+/** POST /v1/clients/invitations: invite a trainee by email. A Coach always adds under themselves; the Head Coach may name a Coach (C-D21). */
+export const inviteClientRequestSchema = z.strictObject({
+  email: z
+    .string()
+    .transform((value) => value.trim().toLowerCase())
+    .pipe(z.string().max(254).regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)),
+  coachId: idSchema.optional(),
+});
+export type InviteClientRequest = z.input<typeof inviteClientRequestSchema>;
+
+/** POST /v1/clients/{id}/move: the Head Coach moves a client to a coach of the gym, or to themselves. */
+export const moveClientRequestSchema = z.strictObject({ coachId: idSchema });
+export type MoveClientRequest = z.infer<typeof moveClientRequestSchema>;
 
 // --- Validation details from a Zod error (same rules as the trainee API) ---
 

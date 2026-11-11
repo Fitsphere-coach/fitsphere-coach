@@ -49,7 +49,8 @@ export function fakeApi(responses: { status: number; body: unknown }[]) {
       auth: new Headers(init?.headers).get('authorization'),
     });
     const next = responses.shift() ?? { status: 500, body: null };
-    return Response.json(next.body, { status: next.status });
+    // A 204 has no body (a Response cannot carry one).
+    return next.status === 204 ? new Response(null, { status: 204 }) : Response.json(next.body, { status: next.status });
   }) as typeof fetch;
   return { fetchImpl, requests };
 }

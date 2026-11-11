@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { errorBodySchema, meResponseSchema } from '@fitsphere-coach/shared';
 import { describe, expect, it } from 'vitest';
 import { createTestAuth, createTestKeys, signToken, TEST_ISSUER } from '../test/helpers/auth.ts';
+import { testOnboarding } from '../test/helpers/onboarding.ts';
 import { buildApp } from './app.ts';
 
 type Row = { id: string; email: string; created_at: Date; roles: string[]; full_name?: string | null };
@@ -19,7 +20,7 @@ function fakeDb(accounts: Map<string, Row>) {
 
 async function setup(accounts = new Map<string, Row>()) {
   const { auth, keys } = await createTestAuth();
-  const app = buildApp({ db: fakeDb(accounts), auth });
+  const app = buildApp({ db: fakeDb(accounts), auth, onboarding: testOnboarding().deps });
   await app.ready();
   return { app, keys, accounts };
 }
@@ -46,7 +47,7 @@ describe('access rules', () => {
   it('a route without an access rule cannot be registered', async () => {
     const { app } = await setup();
     const { auth } = await createTestAuth();
-    const other = buildApp({ db: fakeDb(new Map()), auth });
+    const other = buildApp({ db: fakeDb(new Map()), auth, onboarding: testOnboarding().deps });
     expect(() => other.get('/v1/oops', async () => ({}))).toThrow(/no access rule/);
     await app.close();
   });
@@ -149,7 +150,7 @@ describe('POST /v1/me (validation before any database call)', () => {
 
 async function setupWithSupabase() {
   const { auth, keys, supabase } = await createTestAuth();
-  const app = buildApp({ db: fakeDb(new Map()), auth });
+  const app = buildApp({ db: fakeDb(new Map()), auth, onboarding: testOnboarding().deps });
   await app.ready();
   return { app, keys, supabase };
 }

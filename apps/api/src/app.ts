@@ -5,6 +5,9 @@ import type pg from 'pg';
 import { registerAccess } from './access.ts';
 import type { Auth } from './auth.ts';
 import { errorBody, handleError } from './errors.ts';
+import type { OnboardingDeps } from './onboarding.ts';
+import { registerClientRoutes } from './routes/clients.ts';
+import { registerGymRoutes } from './routes/gym.ts';
 import { registerMeRoutes } from './routes/me.ts';
 
 export type LogOptions = { level: string; stream?: { write(line: string): void } };
@@ -13,6 +16,8 @@ export type AppDeps = {
   /** A pool; tests that never set up accounts may pass a stand-in with `query` only. */
   db: pg.Pool | Pick<pg.Pool, 'query'>;
   auth: Auth;
+  /** Gym onboarding (CF02): the checked settings and the approval-email sender. */
+  onboarding: OnboardingDeps;
   /** Leave out for no logs (most tests). */
   log?: LogOptions;
 };
@@ -64,6 +69,8 @@ export function buildApp(deps: AppDeps) {
     service: 'coach-api',
   }));
   registerMeRoutes(app, deps);
+  registerGymRoutes(app, deps);
+  registerClientRoutes(app, deps);
 
   return app;
 }

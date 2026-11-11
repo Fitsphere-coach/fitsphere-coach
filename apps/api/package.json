@@ -15,9 +15,11 @@
     "@fitsphere-coach/shared": "*",
     "fastify": "^5.12.7",
     "jose": "^6.2.13",
+    "nodemailer": "^10.5.0",
     "pg": "^8.23.1"
   },
   "devDependencies": {
+    "@types/nodemailer": "^8.0.2",
     "@types/pg": "^8.23.1",
     "vitest": "^5.0.5"
   }

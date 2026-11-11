@@ -16,6 +16,15 @@ const me = (roles: string[], coach: { fullName: string } | null = { fullName: 'A
   coach,
 });
 
+const onboarding = (status: 'none' | 'pending' | 'expired' | 'locked') => ({
+  status,
+  expiresAt: status === 'pending' ? '2026-11-19T08:50:00.000Z' : null,
+  triesLeft: status === 'pending' ? 5 : null,
+  requestsLeftToday: 3,
+  codeLength: 6,
+  gymName: null,
+});
+
 describe('passwordRules (CF01 §1)', () => {
   it('needs 8+ characters, a number and a letter', () => {
     expect(passwordRules('iron2').map((rule) => rule.met)).toEqual([false, true, true]);
@@ -80,14 +89,16 @@ describe('ensureAccount (CF01 §2 routing)', () => {
     expect((await ensureAccount(deps(client))).kind).toBe('signedOut');
   });
 
-  it('sets up a new coach sign-up from the metadata, then routes by role', async () => {
+  it('sets up a new coach sign-up from the metadata, then routes to gym onboarding (CF02)', async () => {
     const { client } = fakeClient({ getSession: async () => ({ data: { session: session(coachMetadata) }, error: null }) });
     const api = fakeApi([
       { status: 403, body: errorBody('ACCOUNT_SETUP_REQUIRED') },
       { status: 201, body: me(['personal']) },
+      { status: 200, body: onboarding('none') },
     ]);
     const state = await ensureAccount(deps(client, api.fetchImpl));
-    expect(state.kind).toBe('coachingOff');
+    expect(state).toMatchObject({ kind: 'onboarding', status: { status: 'none' } });
+    expect(api.requests[2]).toMatchObject({ method: 'GET', url: 'http://api.test/v1/gym/onboarding', auth: 'Bearer token-1' });
     expect(api.requests[1]).toMatchObject({
       method: 'POST',
       url: 'http://api.test/v1/me',
@@ -103,12 +114,36 @@ describe('ensureAccount (CF01 §2 routing)', () => {
     expect(api.requests).toHaveLength(1);
   });
 
-  it('does not set anything up for a trainee account without coach sign-up details', async () => {
+  it('sends a trainee account without coach sign-up details to gym onboarding, setting nothing up (CF02)', async () => {
     const { client } = fakeClient({ getSession: async () => ({ data: { session: session() }, error: null }) });
-    const api = fakeApi([{ status: 200, body: me(['personal'], null) }]);
+    const api = fakeApi([
+      { status: 200, body: me(['personal'], null) },
+      { status: 200, body: onboarding('none') },
+    ]);
     const state = await ensureAccount(deps(client, api.fetchImpl));
-    expect(state).toMatchObject({ kind: 'coachingOff', email: 'coach@example.test' });
-    expect(api.requests).toHaveLength(1);
+    expect(state).toMatchObject({ kind: 'onboarding', email: 'coach@example.test', status: { status: 'none' } });
+    expect(api.requests.map((request) => request.method)).toEqual(['GET', 'GET']);
+  });
+
+  it('keeps "coaching is off" for a sign-in with no FitSphere account and no sign-up details', async () => {
+    const { client } = fakeClient({ getSession: async () => ({ data: { session: session() }, error: null }) });
+    const api = fakeApi([{ status: 403, body: errorBody('ACCOUNT_SETUP_REQUIRED') }]);
+    expect(await ensureAccount(deps(client, api.fetchImpl))).toMatchObject({ kind: 'coachingOff', me: null });
+  });
+
+  it('shows the state the server gives for a pending request, and offline or unavailable when it cannot', async () => {
+    const signedIn = fakeClient({ getSession: async () => ({ data: { session: session() }, error: null }) });
+    const pending = fakeApi([
+      { status: 200, body: me(['personal'], null) },
+      { status: 200, body: onboarding('pending') },
+    ]);
+    expect(await ensureAccount(deps(signedIn.client, pending.fetchImpl))).toMatchObject({ kind: 'onboarding', status: { status: 'pending', triesLeft: 5 } });
+
+    const broken = fakeApi([
+      { status: 200, body: me(['personal'], null) },
+      { status: 500, body: errorBody('INTERNAL_ERROR') },
+    ]);
+    expect((await ensureAccount(deps(signedIn.client, broken.fetchImpl))).kind).toBe('unavailable');
   });
 
   it('reports an unverified email', async () => {

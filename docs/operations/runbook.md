@@ -17,6 +17,12 @@
 | `SUPABASE_URL` | `apps/api/.env` | `https://<project-ref>.supabase.co` | No |
 | `SUPABASE_PUBLISHABLE_KEY` | `apps/api/.env` | Supabase → Project Settings → API keys → publishable key (`sb_publishable_…`) | No |
 | `PORT` | `apps/api/.env` | Optional; default `3100` (the trainee API uses 3000, so both can run on one PC) | No |
+| `APPROVAL_INBOX`, `SENDER_EMAIL`, `SENDER_DISPLAY_NAME` | `apps/api/.env` | Where the gym request and its approval code are emailed, and who sends it (ADR-0005, ADR-0008). Starting values are in `.env.example`. | No |
+| `APPROVAL_CODE_LENGTH`, `GYM_REQUEST_VALID_DAYS`, `APPROVAL_WRONG_TRIES`, `GYM_REQUESTS_PER_DAY` | `apps/api/.env` | Code digits (4–8), days a request is valid (1–30), wrong tries (1–10), requests per person per day (1–10). The server refuses to start with a missing or out-of-range value and names it. | No |
+| `APPROVAL_CODE_SECRET` | `apps/api/.env` | The key that scrambles approval codes before they are stored (ADR-0004): 32+ random characters, e.g. `node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`. Changing it makes open requests' codes stop working. | **Yes** |
+| `SMTP_APP_PASSWORD` | `apps/api/.env` | The Google app password of `SENDER_EMAIL` (ADR-0005 "Owner set-up": 2-Step Verification, then App passwords). | **Yes** |
+| `TRAINEE_INVITE_VALID_DAYS`, `INVITES_PER_DAY` | `apps/api/.env` | Days a trainee invitation stays valid (1–30, the same number as the trainee app, TCR-001) and invitations one person may send a day (1–100). | No |
+| `TRAINEE_INVITES_ENABLED` | `apps/api/.env` | `true` or `false`. Keep **false** until Developer 1 has built TCR-001 and its tables exist in the shared database; while false the invite routes answer "not found" and the app hides Invite client (C-D22). | No |
 | `TEST_DATABASE_URL` | `apps/api/.env` or CI | Local test database, e.g. `postgres://postgres:postgres@localhost:5432/fitsphere_coach_test`. **Never Supabase**: the tests drop and recreate schemas `app` and `coach` | No |
 | `EXPO_PUBLIC_SUPABASE_URL` | `apps/mobile/.env` | Same as `SUPABASE_URL` | No |
 | `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `apps/mobile/.env` | Same as `SUPABASE_PUBLISHABLE_KEY` | No |
@@ -57,3 +63,12 @@ trainee app is not affected (C-D22). Both apps send the same emails, with the sa
 3. Start the API: `npm run dev -w @fitsphere-coach/api`. Start the app: `npm start -w @fitsphere-coach/mobile` and scan the QR code with Expo Go (phone on the same Wi-Fi).
 4. Use a **test email** you can read. Turn `HOST` off again afterwards.
 5. The shared Supabase project has **Confirm email** off (C-D9): a new sign-up sends no email and goes straight to **Coaching is off**. A sign-up with an email that already has an account (for example, from the trainee app) shows "Verify your email" but sends nothing (invariant 3): use **Log in** with that account's password instead. Do not change the Supabase setting (C-D7).
+
+## 7. Trying CF02 (gym onboarding) on your phone
+1. Set the new variables in `apps/api/.env` (names in §2): copy the CF02 block from `.env.example`, make an `APPROVAL_CODE_SECRET`, and add `SMTP_APP_PASSWORD` (ADR-0005 "Owner set-up"). The server will not start until every one is valid, and it names the one that is not.
+2. After the CF02 pull request is merged: `npm run migrate -w @fitsphere-coach/api` (adds C0003: `coach.gym_onboarding_requests` and `coach.gyms`; schema `coach` only). Tell Developer 1 first (contract rule 8).
+3. Start the API and the app as in §6. Use a **test email**.
+4. Create an account → the gym form → fill it in → **Send request**. The email with the code arrives in the approval inbox (`APPROVAL_INBOX`).
+5. Enter the code on the phone → "You're a Head Coach" → home. Try a wrong code (tries left), five wrong codes (locked), and a new request after a lock.
+6. Log in on another phone with the same account: it goes straight into the app (approved for good).
+7. Expiry is 7 days by default; to test it quickly, set `GYM_REQUEST_VALID_DAYS=1` for a test gym, or ask for the request's `expires_at` to be moved back in the test database. Never on Supabase without telling the owner.
